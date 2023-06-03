@@ -1,0 +1,488 @@
+#include "tianpower_bms_ble.h"
+#include "esphome/core/log.h"
+#include "esphome/core/helpers.h"
+
+namespace esphome {
+namespace tianpower_bms_ble {
+
+static const char *const TAG = "tianpower_bms_ble";
+
+static const uint16_t TIANPOWER_BMS_SERVICE_UUID = 0xFF00;
+static const uint16_t TIANPOWER_BMS_NOTIFY_CHARACTERISTIC_UUID = 0xFF01;   // handle 0x13
+static const uint16_t TIANPOWER_BMS_NOTIFY2_CHARACTERISTIC_UUID = 0xFF03;  // handle 0x18
+static const uint16_t TIANPOWER_BMS_CONTROL_CHARACTERISTIC_UUID = 0xFF02;  // handle 0x15
+
+static const uint16_t MAX_RESPONSE_SIZE = 20;
+
+static const uint8_t TIANPOWER_PKT_START = 0x55;
+static const uint8_t TIANPOWER_FUNCTION_REQUEST = 0x04;
+static const uint8_t TIANPOWER_FUNCTION_RESPONSE = 0x14;
+static const uint8_t TIANPOWER_PKT_END = 0xAA;
+
+static const uint8_t TIANPOWER_FRAME_TYPE_SOFTWARE_VERSION = 0x81;
+static const uint8_t TIANPOWER_FRAME_TYPE_HARDWARE_VERSION = 0x82;
+static const uint8_t TIANPOWER_FRAME_TYPE_STATUS = 0x83;
+static const uint8_t TIANPOWER_FRAME_TYPE_GENERAL_INFO = 0x84;
+static const uint8_t TIANPOWER_FRAME_TYPE_MOSFET_STATUS = 0x85;
+static const uint8_t TIANPOWER_FRAME_TYPE_GYRO = 0x86;
+static const uint8_t TIANPOWER_FRAME_TYPE_TEMPERATURES = 0x87;
+static const uint8_t TIANPOWER_FRAME_TYPE_CELL_VOLTAGES_1_8 = 0x88;
+static const uint8_t TIANPOWER_FRAME_TYPE_CELL_VOLTAGES_9_16 = 0x89;
+static const uint8_t TIANPOWER_FRAME_TYPE_CELL_VOLTAGES_17_24 = 0x8A;
+static const uint8_t TIANPOWER_FRAME_TYPE_LOCATION = 0x90;
+static const uint8_t TIANPOWER_FRAME_TYPE_OWNER = 0x94;
+
+static const uint8_t TIANPOWER_COMMAND_QUEUE_SIZE = 6;
+static const uint8_t TIANPOWER_COMMAND_QUEUE[TIANPOWER_COMMAND_QUEUE_SIZE] = {
+    TIANPOWER_FRAME_TYPE_STATUS,       TIANPOWER_FRAME_TYPE_GENERAL_INFO,      TIANPOWER_FRAME_TYPE_MOSFET_STATUS,
+    TIANPOWER_FRAME_TYPE_TEMPERATURES, TIANPOWER_FRAME_TYPE_CELL_VOLTAGES_1_8, TIANPOWER_FRAME_TYPE_CELL_VOLTAGES_9_16,
+    // TIANPOWER_FRAME_TYPE_CELL_VOLTAGES_17_24,
+};
+
+void TianpowerBmsBle::gattc_event_handler(esp_gattc_cb_event_t event, esp_gatt_if_t gattc_if,
+                                          esp_ble_gattc_cb_param_t *param) {
+  switch (event) {
+    case ESP_GATTC_OPEN_EVT: {
+      break;
+    }
+    case ESP_GATTC_DISCONNECT_EVT: {
+      this->node_state = espbt::ClientState::IDLE;
+
+      // this->publish_state_(this->voltage_sensor_, NAN);
+      break;
+    }
+    case ESP_GATTC_SEARCH_CMPL_EVT: {
+      // [V][esp32_ble_client:192]: [0] [90:A6:BF:93:A0:69] Service UUID: 0x1800
+      // [V][esp32_ble_client:194]: [0] [90:A6:BF:93:A0:69]  start_handle: 0x1  end_handle: 0x7
+      // [V][esp32_ble_client:192]: [0] [90:A6:BF:93:A0:69] Service UUID: 0x1801
+      // [V][esp32_ble_client:194]: [0] [90:A6:BF:93:A0:69]  start_handle: 0x8  end_handle: 0xf
+      // [V][esp32_ble_client:192]: [0] [90:A6:BF:93:A0:69] Service UUID: 0xFF00
+      // [V][esp32_ble_client:194]: [0] [90:A6:BF:93:A0:69]  start_handle: 0x10  end_handle: 0x18
+
+      auto *char_notify =
+          this->parent_->get_characteristic(TIANPOWER_BMS_SERVICE_UUID, TIANPOWER_BMS_NOTIFY_CHARACTERISTIC_UUID);
+      if (char_notify == nullptr) {
+        ESP_LOGE(TAG, "[%s] No notify service found at device, not an Tianpower BMS..?",
+                 this->parent_->address_str().c_str());
+        break;
+      }
+      this->char_notify_handle_ = char_notify->handle;
+
+      auto status = esp_ble_gattc_register_for_notify(this->parent()->get_gattc_if(), this->parent()->get_remote_bda(),
+                                                      char_notify->handle);
+      if (status) {
+        ESP_LOGW(TAG, "esp_ble_gattc_register_for_notify failed, status=%d", status);
+      }
+
+      //      auto *char_notify2 =
+      //          this->parent_->get_characteristic(TIANPOWER_BMS_SERVICE_UUID,
+      //          TIANPOWER_BMS_NOTIFY2_CHARACTERISTIC_UUID);
+      //      if (char_notify2 == nullptr) {
+      //        ESP_LOGE(TAG, "[%s] No notify service found at device, not an Tianpower BMS..?",
+      //                 this->parent_->address_str().c_str());
+      //        break;
+      //      }
+      //      this->char_notify2_handle_ = char_notify->handle;
+      //
+      //      auto status2 = esp_ble_gattc_register_for_notify(this->parent()->get_gattc_if(),
+      //        this->parent()->get_remote_bda(), char_notify->handle);
+      //      if (status2) {
+      //        ESP_LOGW(TAG, "esp_ble_gattc_register_for_notify failed, status=%d", status2);
+      //      }
+
+      auto *char_command =
+          this->parent_->get_characteristic(TIANPOWER_BMS_SERVICE_UUID, TIANPOWER_BMS_CONTROL_CHARACTERISTIC_UUID);
+      if (char_command == nullptr) {
+        ESP_LOGE(TAG, "[%s] No control service found at device, not an BASEN BMS..?",
+                 this->parent_->address_str().c_str());
+        break;
+      }
+      this->char_command_handle_ = char_command->handle;
+      break;
+    }
+    case ESP_GATTC_REG_FOR_NOTIFY_EVT: {
+      this->node_state = espbt::ClientState::ESTABLISHED;
+
+      this->send_command_(TIANPOWER_FRAME_TYPE_SOFTWARE_VERSION);
+      this->send_command_(TIANPOWER_FRAME_TYPE_HARDWARE_VERSION);
+      break;
+    }
+    case ESP_GATTC_NOTIFY_EVT: {
+      ESP_LOGV(TAG, "Notification received (handle 0x%02X): %s", param->notify.handle,
+               format_hex_pretty(param->notify.value, param->notify.value_len).c_str());
+
+      std::vector<uint8_t> data(param->notify.value, param->notify.value + param->notify.value_len);
+
+      this->on_tianpower_bms_ble_data(param->notify.handle, data);
+      break;
+    }
+    default:
+      break;
+  }
+}
+
+void TianpowerBmsBle::update() {
+  if (this->node_state != espbt::ClientState::ESTABLISHED) {
+    ESP_LOGW(TAG, "[%s] Not connected", this->parent_->address_str().c_str());
+    return;
+  }
+
+  // Loop through all commands if connected
+  if (this->next_command_ != TIANPOWER_COMMAND_QUEUE_SIZE) {
+    ESP_LOGW(TAG,
+             "Command queue (%d of %d) was not completely processed. "
+             "Please increase the update_interval if you see this warning frequently",
+             this->next_command_ + 1, TIANPOWER_COMMAND_QUEUE_SIZE);
+  }
+  this->next_command_ = 0;
+  this->send_command_(TIANPOWER_COMMAND_QUEUE[this->next_command_++ % TIANPOWER_COMMAND_QUEUE_SIZE]);
+}
+
+void TianpowerBmsBle::on_tianpower_bms_ble_data(const uint8_t &handle, const std::vector<uint8_t> &data) {
+  if (data[0] != TIANPOWER_PKT_START || data.back() != TIANPOWER_PKT_END || data.size() != MAX_RESPONSE_SIZE) {
+    ESP_LOGW(TAG, "Invalid response received: %s", format_hex_pretty(&data.front(), data.size()).c_str());
+    return;
+  }
+
+  uint8_t frame_type = data[2];
+
+  switch (frame_type) {
+    case TIANPOWER_FRAME_TYPE_SOFTWARE_VERSION:
+      this->decode_software_version_data_(data);
+      break;
+    case TIANPOWER_FRAME_TYPE_HARDWARE_VERSION:
+      this->decode_hardware_version_data_(data);
+      break;
+    case TIANPOWER_FRAME_TYPE_STATUS:
+      this->decode_status_data_(data);
+      break;
+    case TIANPOWER_FRAME_TYPE_GENERAL_INFO:
+      this->decode_general_info_data_(data);
+      break;
+    case TIANPOWER_FRAME_TYPE_MOSFET_STATUS:
+      ESP_LOGD(TAG, "The mosfet status frame isn't supported yet");
+      break;
+    case TIANPOWER_FRAME_TYPE_TEMPERATURES:
+      this->decode_temperature_data_(data);
+      break;
+    case TIANPOWER_FRAME_TYPE_CELL_VOLTAGES_1_8:
+    case TIANPOWER_FRAME_TYPE_CELL_VOLTAGES_9_16:
+    case TIANPOWER_FRAME_TYPE_CELL_VOLTAGES_17_24:
+      this->decode_cell_voltages_data_(frame_type - TIANPOWER_FRAME_TYPE_CELL_VOLTAGES_1_8, data);
+      break;
+    case TIANPOWER_FRAME_TYPE_LOCATION:
+    case TIANPOWER_FRAME_TYPE_LOCATION + 1:
+      ESP_LOGD(TAG, "The location frame isn't supported yet");
+      break;
+    case TIANPOWER_FRAME_TYPE_OWNER:
+    case TIANPOWER_FRAME_TYPE_OWNER + 1:
+      ESP_LOGD(TAG, "The owner frame isn't supported yet");
+      break;
+    default:
+      ESP_LOGW(TAG, "Unhandled response received (frame_type 0x%02X): %s", frame_type,
+               format_hex_pretty(&data.front(), data.size()).c_str());
+  }
+
+  // Send next command after each received frame
+  if (this->next_command_ < TIANPOWER_COMMAND_QUEUE_SIZE) {
+    this->send_command_(TIANPOWER_COMMAND_QUEUE[this->next_command_++ % TIANPOWER_COMMAND_QUEUE_SIZE]);
+  }
+}
+
+void TianpowerBmsBle::decode_software_version_data_(const std::vector<uint8_t> &data) {
+  ESP_LOGI(TAG, "Software version frame received");
+  ESP_LOGD(TAG, "  %s", format_hex_pretty(&data.front(), data.size()).c_str());
+
+  // Byte Len Payload      Description                      Unit  Precision
+  //  0    1  0x55         Start of frame
+  //  1    1  0x14         Frame type (Response)
+  //  2    1  0x81         Address
+
+  //  3    16 0x30 0x2e 0x31 0x2e 0x31 0x30 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00    "0.1.10"
+  this->publish_state_(this->software_version_text_sensor_, std::string(data.begin() + 3, data.end() - 1));
+
+  //  19   1  0xaa         End of frame
+}
+
+void TianpowerBmsBle::decode_hardware_version_data_(const std::vector<uint8_t> &data) {
+  ESP_LOGI(TAG, "Hardware version frame received");
+  ESP_LOGD(TAG, "  %s", format_hex_pretty(&data.front(), data.size()).c_str());
+
+  // Byte Len Payload      Description                      Unit  Precision
+  //  0    1  0x55         Start of frame
+  //  1    1  0x14         Frame type (Response)
+  //  2    1  0x82         Address
+
+  //  3    16 0x54 0x50 0x2d 0x4c 0x54 0x35 0x35 0x00 0x54 0x42 0x00 0x00 0x00 0x00 0x00 0x00    "TP-LT55" "TB"
+  this->publish_state_(this->device_model_text_sensor_, std::string(data.begin() + 3, data.end() - 1));
+
+  //  19   1  0xaa         End of frame
+}
+
+void TianpowerBmsBle::decode_status_data_(const std::vector<uint8_t> &data) {
+  auto tianpower_get_16bit = [&](size_t i) -> uint16_t {
+    return (uint16_t(data[i + 0]) << 8) | (uint16_t(data[i + 1]) << 0);
+  };
+
+  ESP_LOGI(TAG, "Status frame received");
+  ESP_LOGD(TAG, "  %s", format_hex_pretty(&data.front(), data.size()).c_str());
+
+  // Byte Len Payload      Description                      Unit  Precision
+  //  0    1  0x55         Start of frame
+  //  1    1  0x14         Frame type (Response)
+  //  2    1  0x83         Address
+  //  3    2  0x00 0x3c    State of charge (60%)              %   1.0    60%
+  this->publish_state_(this->state_of_charge_sensor_, tianpower_get_16bit(3) * 1.0f);
+
+  //  5    2  0x14 0x72    Total voltage                      V   0.01f  52.34V
+  float total_voltage = tianpower_get_16bit(5) * 0.01f;
+  this->publish_state_(this->total_voltage_sensor_, total_voltage);
+
+  //  7    2  0x01 0x18    Average temperature               °C   0.1f   28.0°C
+  this->publish_state_(this->average_temperature_sensor_, tianpower_get_16bit(7) * 0.1f);
+
+  //  9    2  0x00 0xe6    Ambient temperature               °C   0.1f   23.0°C
+  this->publish_state_(this->ambient_temperature_sensor_, tianpower_get_16bit(9) * 0.1f);
+
+  //  11   2  0x00 0xf0    Mosfet temperature                °C   0.1f   24.0°C
+  this->publish_state_(this->mosfet_temperature_sensor_, tianpower_get_16bit(11) * 0.1f);
+
+  //  13   2  0x00 0x00    Current (signed)
+  float current = ((int16_t) tianpower_get_16bit(13)) * 1.0f;
+  this->publish_state_(this->current_sensor_, current);
+  float power = total_voltage * current;
+  this->publish_state_(this->power_sensor_, power);
+  this->publish_state_(this->charging_power_sensor_, std::max(0.0f, power));               // 500W vs 0W -> 500W
+  this->publish_state_(this->discharging_power_sensor_, std::abs(std::min(0.0f, power)));  // -500W vs 0W -> 500W
+
+  //  15   2  0x30 0x30    Unknown (signed)
+
+  //  17   2  0x00 0x64    State of health                    %   1.0    100%
+  this->publish_state_(this->state_of_health_sensor_, tianpower_get_16bit(17) * 1.0f);
+
+  //  19   1  0xaa         End of frame
+}
+
+void TianpowerBmsBle::decode_general_info_data_(const std::vector<uint8_t> &data) {
+  auto tianpower_get_16bit = [&](size_t i) -> uint16_t {
+    return (uint16_t(data[i + 0]) << 8) | (uint16_t(data[i + 1]) << 0);
+  };
+
+  ESP_LOGI(TAG, "General info frame received");
+  ESP_LOGD(TAG, "  %s", format_hex_pretty(&data.front(), data.size()).c_str());
+
+  // Byte Len Payload      Description                      Unit  Precision
+  //  0    1  0x55         Start of frame
+  //  1    1  0x14         Frame type (Response)
+  //  2    1  0x84         Address
+  //  3    1  0x10         Cell count                             1.0    16
+  //  4    1  0x04         Temp sensors                           1.0    16
+
+  //  5    2  0x59 0xd8    Nominal capaciy                   Ah   0.01f  230.00 Ah
+  this->publish_state_(this->nominal_capacity_sensor_, tianpower_get_16bit(5) * 0.01f);
+
+  //  7    2  0x36 0x48    Capacity remaining                Ah   0.01f  138.96 Ah
+  this->publish_state_(this->capacity_remaining_sensor_, tianpower_get_16bit(7) * 0.01f);
+
+  //  9    2  0x00 0x00    Cycle count                            1.0    0
+  this->publish_state_(this->charging_cycles_sensor_, tianpower_get_16bit(9) * 1.0f);
+
+  //  11   2  0x00 0x00    Voltage Status Bitmask
+  //  13   2  0x00 0x00    Current Status Bitmask
+  //  15   2  0x00 0x00    Temperature Status Bitmask
+  //  17   2  0x00 0x00    Alarm Bitmask
+  //  19   1  0xaa         End of frame
+}
+
+void TianpowerBmsBle::decode_temperature_data_(const std::vector<uint8_t> &data) {
+  auto tianpower_get_16bit = [&](size_t i) -> uint16_t {
+    return (uint16_t(data[i + 0]) << 8) | (uint16_t(data[i + 1]) << 0);
+  };
+
+  ESP_LOGI(TAG, "Temperature frame received");
+  ESP_LOGD(TAG, "  %s", format_hex_pretty(&data.front(), data.size()).c_str());
+
+  // Byte Len Payload      Description                      Unit  Precision
+  //  0    1  0x55         Start of frame
+  //  1    1  0x14         Frame type (Response)
+  //  2    1  0x87         Address
+  //  3    2  0x00 0xe6    Temperature 1                    °C    0.1f  23.0°C
+  //  5    2  0x00 0xe6    Temperature 2                    °C    0.1f  23.0°C
+  //  7    2  0x00 0xe6    Temperature 3                    °C    0.1f  23.0°C
+  //  9    2  0x00 0xe6    Temperature 4                    °C    0.1f  23.0°C
+  //  11   2  0x00 0x00    Temperature 5
+  //  13   2  0x00 0x00    Temperature 6
+  //  15   2  0x00 0x00    Temperature 7
+  //  17   2  0x00 0x00    Temperature 8
+  for (uint8_t i = 0; i < 8; i++) {
+    this->publish_state_(this->temperatures_[i].temperature_sensor_,
+                         ((int16_t) tianpower_get_16bit((i * 2) + 3)) * 0.1f);
+  }
+
+  //  19   1  0xaa         End of frame
+}
+
+void TianpowerBmsBle::decode_cell_voltages_data_(const uint8_t &chunk, const std::vector<uint8_t> &data) {
+  auto tianpower_get_16bit = [&](size_t i) -> uint16_t {
+    return (uint16_t(data[i + 0]) << 8) | (uint16_t(data[i + 1]) << 0);
+  };
+
+  uint8_t offset = 8 * chunk;
+
+  ESP_LOGI(TAG, "Cell voltages frame (chunk %d) received", chunk);
+  ESP_LOGD(TAG, "  %s", format_hex_pretty(&data.front(), data.size()).c_str());
+
+  // Byte Len Payload      Description                      Unit  Precision
+  //  0    1  0x55         Start of frame
+  //  1    1  0x14         Frame type (Response)
+  //  2    1  0x87         Address
+  //  3    2  0x96 0x0C    Cell voltage 1                   V     0.001f  3.265V
+  //  5    2  0x97 0x0C    Cell voltage 2                   V     0.001f  3.285V
+  //  7    2  0x98 0x0C    Cell voltage 3                   V     0.001f  3.282V
+  //  9    2  0x98 0x0C    Cell voltage 4                   V     0.001f
+  //  11   2  0x96 0x0C    Cell voltage 5                   V     0.001f
+  //  13   2  0x96 0x0C    Cell voltage 6                   V     0.001f
+  //  15   2  0x98 0x0C    Cell voltage 7                   V     0.001f
+  //  17   2  0x98 0x0C    Cell voltage 8                   V     0.001f
+  for (uint8_t i = 0; i < 8; i++) {
+    float cell_voltage = tianpower_get_16bit((i * 2) + 3) * 0.001f;
+    if (cell_voltage > 0 && cell_voltage < this->min_cell_voltage_) {
+      this->min_cell_voltage_ = cell_voltage;
+      this->min_voltage_cell_ = i + offset + 1;
+    }
+    if (cell_voltage > this->max_cell_voltage_) {
+      this->max_cell_voltage_ = cell_voltage;
+      this->max_voltage_cell_ = i + offset + 1;
+    }
+    this->publish_state_(this->cells_[i + offset].cell_voltage_sensor_, cell_voltage);
+  }
+
+  // Publish aggregated sensors at the last chunk. Must be improved if 3 chunks are retrieved.
+  if (chunk == 1) {
+    this->publish_state_(this->min_cell_voltage_sensor_, this->min_cell_voltage_);
+    this->publish_state_(this->max_cell_voltage_sensor_, this->max_cell_voltage_);
+    this->publish_state_(this->max_voltage_cell_sensor_, (float) this->max_voltage_cell_);
+    this->publish_state_(this->min_voltage_cell_sensor_, (float) this->min_voltage_cell_);
+    this->publish_state_(this->delta_cell_voltage_sensor_, this->max_cell_voltage_ - this->min_cell_voltage_);
+  }
+
+  //  19   1  0xaa         End of frame
+}
+
+void TianpowerBmsBle::dump_config() {  // NOLINT(google-readability-function-size,readability-function-size)
+  ESP_LOGCONFIG(TAG, "TianpowerBmsBle:");
+
+  LOG_BINARY_SENSOR("", "Balancing", this->balancing_binary_sensor_);
+  LOG_BINARY_SENSOR("", "Charging", this->charging_binary_sensor_);
+  LOG_BINARY_SENSOR("", "Discharging", this->discharging_binary_sensor_);
+
+  LOG_SENSOR("", "Total voltage", this->total_voltage_sensor_);
+  LOG_SENSOR("", "Current", this->current_sensor_);
+  LOG_SENSOR("", "Power", this->power_sensor_);
+  LOG_SENSOR("", "Charging power", this->charging_power_sensor_);
+  LOG_SENSOR("", "Discharging power", this->discharging_power_sensor_);
+  LOG_SENSOR("", "Capacity remaining", this->capacity_remaining_sensor_);
+  LOG_SENSOR("", "Charging states bitmask", this->charging_states_bitmask_sensor_);
+  LOG_SENSOR("", "Discharging states bitmask", this->discharging_states_bitmask_sensor_);
+  LOG_SENSOR("", "Charging warnings bitmask", this->charging_warnings_bitmask_sensor_);
+  LOG_SENSOR("", "Discharging warnings bitmask", this->discharging_warnings_bitmask_sensor_);
+  LOG_SENSOR("", "State of charge", this->state_of_charge_sensor_);
+  LOG_SENSOR("", "Nominal capacity", this->nominal_capacity_sensor_);
+  LOG_SENSOR("", "Charging cycles", this->charging_cycles_sensor_);
+  LOG_SENSOR("", "Min cell voltage", this->min_cell_voltage_sensor_);
+  LOG_SENSOR("", "Max cell voltage", this->max_cell_voltage_sensor_);
+  LOG_SENSOR("", "Min voltage cell", this->min_voltage_cell_sensor_);
+  LOG_SENSOR("", "Max voltage cell", this->max_voltage_cell_sensor_);
+  LOG_SENSOR("", "Delta cell voltage", this->delta_cell_voltage_sensor_);
+  LOG_SENSOR("", "Average temperature", this->average_temperature_sensor_);
+  LOG_SENSOR("", "Ambient temperature", this->ambient_temperature_sensor_);
+  LOG_SENSOR("", "Mosfet temperature", this->mosfet_temperature_sensor_);
+  LOG_SENSOR("", "State of health", this->state_of_charge_sensor_);
+  LOG_SENSOR("", "Temperature 1", this->temperatures_[0].temperature_sensor_);
+  LOG_SENSOR("", "Temperature 2", this->temperatures_[1].temperature_sensor_);
+  LOG_SENSOR("", "Temperature 3", this->temperatures_[2].temperature_sensor_);
+  LOG_SENSOR("", "Temperature 4", this->temperatures_[3].temperature_sensor_);
+  LOG_SENSOR("", "Temperature 5", this->temperatures_[4].temperature_sensor_);
+  LOG_SENSOR("", "Temperature 6", this->temperatures_[5].temperature_sensor_);
+  LOG_SENSOR("", "Temperature 7", this->temperatures_[6].temperature_sensor_);
+  LOG_SENSOR("", "Temperature 8", this->temperatures_[7].temperature_sensor_);
+  LOG_SENSOR("", "Cell Voltage 1", this->cells_[0].cell_voltage_sensor_);
+  LOG_SENSOR("", "Cell Voltage 2", this->cells_[1].cell_voltage_sensor_);
+  LOG_SENSOR("", "Cell Voltage 3", this->cells_[2].cell_voltage_sensor_);
+  LOG_SENSOR("", "Cell Voltage 4", this->cells_[3].cell_voltage_sensor_);
+  LOG_SENSOR("", "Cell Voltage 5", this->cells_[4].cell_voltage_sensor_);
+  LOG_SENSOR("", "Cell Voltage 6", this->cells_[5].cell_voltage_sensor_);
+  LOG_SENSOR("", "Cell Voltage 7", this->cells_[6].cell_voltage_sensor_);
+  LOG_SENSOR("", "Cell Voltage 8", this->cells_[7].cell_voltage_sensor_);
+  LOG_SENSOR("", "Cell Voltage 9", this->cells_[8].cell_voltage_sensor_);
+  LOG_SENSOR("", "Cell Voltage 10", this->cells_[9].cell_voltage_sensor_);
+  LOG_SENSOR("", "Cell Voltage 11", this->cells_[10].cell_voltage_sensor_);
+  LOG_SENSOR("", "Cell Voltage 12", this->cells_[11].cell_voltage_sensor_);
+  LOG_SENSOR("", "Cell Voltage 13", this->cells_[12].cell_voltage_sensor_);
+  LOG_SENSOR("", "Cell Voltage 14", this->cells_[13].cell_voltage_sensor_);
+  LOG_SENSOR("", "Cell Voltage 15", this->cells_[14].cell_voltage_sensor_);
+  LOG_SENSOR("", "Cell Voltage 16", this->cells_[15].cell_voltage_sensor_);
+  LOG_SENSOR("", "Cell Voltage 17", this->cells_[16].cell_voltage_sensor_);
+  LOG_SENSOR("", "Cell Voltage 18", this->cells_[17].cell_voltage_sensor_);
+  LOG_SENSOR("", "Cell Voltage 19", this->cells_[18].cell_voltage_sensor_);
+  LOG_SENSOR("", "Cell Voltage 20", this->cells_[19].cell_voltage_sensor_);
+  LOG_SENSOR("", "Cell Voltage 21", this->cells_[20].cell_voltage_sensor_);
+  LOG_SENSOR("", "Cell Voltage 22", this->cells_[21].cell_voltage_sensor_);
+  LOG_SENSOR("", "Cell Voltage 23", this->cells_[22].cell_voltage_sensor_);
+  LOG_SENSOR("", "Cell Voltage 24", this->cells_[23].cell_voltage_sensor_);
+
+  LOG_TEXT_SENSOR("", "Charging states", this->charging_states_text_sensor_);
+  LOG_TEXT_SENSOR("", "Discharging states", this->discharging_states_text_sensor_);
+  LOG_TEXT_SENSOR("", "Charging warnings", this->charging_warnings_text_sensor_);
+  LOG_TEXT_SENSOR("", "Discharging warnings", this->discharging_warnings_text_sensor_);
+}
+
+void TianpowerBmsBle::publish_state_(binary_sensor::BinarySensor *binary_sensor, const bool &state) {
+  if (binary_sensor == nullptr)
+    return;
+
+  binary_sensor->publish_state(state);
+}
+
+void TianpowerBmsBle::publish_state_(sensor::Sensor *sensor, float value) {
+  if (sensor == nullptr)
+    return;
+
+  sensor->publish_state(value);
+}
+
+void TianpowerBmsBle::publish_state_(text_sensor::TextSensor *text_sensor, const std::string &state) {
+  if (text_sensor == nullptr)
+    return;
+
+  text_sensor->publish_state(state);
+}
+
+void TianpowerBmsBle::write_register(uint8_t address, uint16_t value) {
+  // this->send_command_(TIANPOWER_CMD_WRITE, TIANPOWER_CMD_MOS);  // @TODO: Pass value
+}
+
+bool TianpowerBmsBle::send_command_(uint8_t function) {
+  uint8_t frame[4];
+
+  frame[0] = TIANPOWER_PKT_START;
+  frame[1] = TIANPOWER_FUNCTION_REQUEST;
+  frame[2] = function;
+  frame[3] = TIANPOWER_PKT_END;
+
+  ESP_LOGD(TAG, "Send command (handle 0x%02X): %s", this->char_command_handle_,
+           format_hex_pretty(frame, sizeof(frame)).c_str());
+
+  auto status =
+      esp_ble_gattc_write_char(this->parent_->get_gattc_if(), this->parent_->get_conn_id(), this->char_command_handle_,
+                               sizeof(frame), frame, ESP_GATT_WRITE_TYPE_NO_RSP, ESP_GATT_AUTH_REQ_NONE);
+
+  if (status) {
+    ESP_LOGW(TAG, "[%s] esp_ble_gattc_write_char failed, status=%d", this->parent_->address_str().c_str(), status);
+  }
+
+  return (status == 0);
+}
+
+}  // namespace tianpower_bms_ble
+}  // namespace esphome
