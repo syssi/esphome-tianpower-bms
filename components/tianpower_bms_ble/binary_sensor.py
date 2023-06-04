@@ -12,15 +12,18 @@ CODEOWNERS = ["@syssi"]
 CONF_BALANCING = "balancing"
 CONF_CHARGING = "charging"
 CONF_DISCHARGING = "discharging"
+CONF_LIMITING_CURRENT = "limiting_current"
 
 ICON_BALANCING = "mdi:battery-heart-variant"
 ICON_CHARGING = "mdi:battery-charging"
 ICON_DISCHARGING = "mdi:power-plug"
+ICON_LIMITING_CURRENT = "mdi:car-speed-limiter"
 
 BINARY_SENSORS = [
     # CONF_BALANCING,
-    # CONF_CHARGING,
-    # CONF_DISCHARGING,
+    CONF_CHARGING,
+    CONF_DISCHARGING,
+    CONF_LIMITING_CURRENT,
 ]
 
 CONFIG_SCHEMA = cv.Schema(
@@ -42,6 +45,12 @@ CONFIG_SCHEMA = cv.Schema(
             {
                 cv.GenerateID(): cv.declare_id(binary_sensor.BinarySensor),
                 cv.Optional(CONF_ICON, default=ICON_DISCHARGING): cv.icon,
+            }
+        ),
+        cv.Optional(CONF_LIMITING_CURRENT): binary_sensor.BINARY_SENSOR_SCHEMA.extend(
+            {
+                cv.GenerateID(): cv.declare_id(binary_sensor.BinarySensor),
+                cv.Optional(CONF_ICON, default=ICON_LIMITING_CURRENT): cv.icon,
             }
         ),
     }

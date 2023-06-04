@@ -33,6 +33,9 @@ class TianpowerBmsBle : public esphome::ble_client::BLEClientNode, public Pollin
   void set_discharging_binary_sensor(binary_sensor::BinarySensor *discharging_binary_sensor) {
     discharging_binary_sensor_ = discharging_binary_sensor;
   }
+  void set_limiting_current_binary_sensor(binary_sensor::BinarySensor *limiting_current_binary_sensor) {
+    limiting_current_binary_sensor_ = limiting_current_binary_sensor;
+  }
 
   void set_total_voltage_sensor(sensor::Sensor *total_voltage_sensor) { total_voltage_sensor_ = total_voltage_sensor; }
   void set_current_sensor(sensor::Sensor *current_sensor) { current_sensor_ = current_sensor; }
@@ -131,6 +134,7 @@ class TianpowerBmsBle : public esphome::ble_client::BLEClientNode, public Pollin
   binary_sensor::BinarySensor *balancing_binary_sensor_;
   binary_sensor::BinarySensor *charging_binary_sensor_;
   binary_sensor::BinarySensor *discharging_binary_sensor_;
+  binary_sensor::BinarySensor *limiting_current_binary_sensor_;
 
   sensor::Sensor *total_voltage_sensor_;
   sensor::Sensor *current_sensor_;
@@ -186,12 +190,15 @@ class TianpowerBmsBle : public esphome::ble_client::BLEClientNode, public Pollin
   void decode_hardware_version_data_(const std::vector<uint8_t> &data);
   void decode_status_data_(const std::vector<uint8_t> &data);
   void decode_general_info_data_(const std::vector<uint8_t> &data);
+  void decode_mosfet_status_data_(const std::vector<uint8_t> &data);
   void decode_temperature_data_(const std::vector<uint8_t> &data);
   void decode_cell_voltages_data_(const uint8_t &chunk, const std::vector<uint8_t> &data);
   void publish_state_(binary_sensor::BinarySensor *binary_sensor, const bool &state);
   void publish_state_(sensor::Sensor *sensor, float value);
   void publish_state_(text_sensor::TextSensor *text_sensor, const std::string &state);
   bool send_command_(uint8_t function);
+
+  bool check_bit_(uint8_t mask, uint8_t flag) { return (mask & flag) == flag; }
 };
 
 }  // namespace tianpower_bms_ble

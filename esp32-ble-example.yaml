@@ -50,8 +50,19 @@ tianpower_bms_ble:
     id: bms0
     update_interval: 10s
 
+binary_sensor:
+  - platform: tianpower_bms_ble
+    tianpower_bms_ble_id: bms0
+    charging:
+      name: "${name} charging"
+    discharging:
+      name: "${name} discharging"
+    limiting_current:
+      name: "${name} limiting current"
+
 sensor:
   - platform: tianpower_bms_ble
+    tianpower_bms_ble_id: bms0
     total_voltage:
       name: "${name} total voltage"
     current:
@@ -133,6 +144,7 @@ sensor:
 
 text_sensor:
   - platform: tianpower_bms_ble
+    tianpower_bms_ble_id: bms0
     software_version:
       name: "${name} software version"
     device_model:
