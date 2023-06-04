@@ -56,18 +56,16 @@ esphome run esp32-example.yaml
 ## Example response all sensors enabled
 
 ```
-[I][tianpower_bms_ble:193]: Software version frame received
-[D][tianpower_bms_ble:194]:   55.14.81.30.2E.31.2E.31.30.00.00.00.00.00.00.00.00.00.00.AA (20)
-[V][text_sensor:013]: 'tianpower-bms-ble software version': Received new state 0.1.10
+[I][tianpower_bms_ble:273]: Software version frame received
+[D][tianpower_bms_ble:274]:   55.14.81.30.2E.31.2E.31.30.00.00.00.00.00.00.00.00.00.00.AA (20)
 [D][text_sensor:064]: 'tianpower-bms-ble software version': Sending state '0.1.10'
 
-[I][tianpower_bms_ble:208]: Hardware version frame received
-[D][tianpower_bms_ble:209]:   55.14.82.54.50.2D.4C.54.35.35.00.54.42.00.00.00.00.00.00.AA (20)
-[V][text_sensor:013]: 'tianpower-bms-ble device model': Received new state TP-LT55
+[I][tianpower_bms_ble:288]: Hardware version frame received
+[D][tianpower_bms_ble:289]:   55.14.82.54.50.2D.4C.54.35.35.00.54.42.00.00.00.00.00.00.AA (20)
 [D][text_sensor:064]: 'tianpower-bms-ble device model': Sending state 'TP-LT55'
 
-[I][tianpower_bms_ble:227]: Status frame received
-[D][tianpower_bms_ble:228]:   55.14.83.00.3C.14.72.01.18.00.E6.00.F0.00.00.30.30.00.64.AA (20)
+[I][tianpower_bms_ble:307]: Status frame received
+[D][tianpower_bms_ble:308]:   55.14.83.00.3C.14.72.01.18.00.E6.00.F0.00.00.30.30.00.64.AA (20)
 [D][sensor:094]: 'tianpower-bms-ble state of charge': Sending state 60.00000 % with 0 decimals of accuracy
 [D][sensor:094]: 'tianpower-bms-ble total voltage': Sending state 52.34000 V with 2 decimals of accuracy
 [D][sensor:094]: 'tianpower-bms-ble average temperature': Sending state 28.00000 °C with 1 decimals of accuracy
@@ -79,22 +77,34 @@ esphome run esp32-example.yaml
 [D][sensor:094]: 'tianpower-bms-ble discharging power': Sending state 0.00000 W with 2 decimals of accuracy
 [D][sensor:094]: 'tianpower-bms-ble state of health': Sending state 100.00000 % with 0 decimals of accuracy
 
-[I][tianpower_bms_ble:271]: General info frame received
-[D][tianpower_bms_ble:272]:   55.14.84.10.04.59.D8.36.48.00.00.00.00.00.00.00.00.00.00.AA (20)
+[I][tianpower_bms_ble:351]: General info frame received
+[D][tianpower_bms_ble:352]:   55.14.84.10.04.59.D8.36.48.00.00.00.00.00.00.00.00.00.00.AA (20)
 [D][sensor:094]: 'tianpower-bms-ble nominal capacity': Sending state 230.00000 Ah with 3 decimals of accuracy
 [D][sensor:094]: 'tianpower-bms-ble capacity remaining': Sending state 138.95999 Ah with 3 decimals of accuracy
 [D][sensor:094]: 'tianpower-bms-ble charging cycles': Sending state 0.00000  with 0 decimals of accuracy
-[D][tianpower_bms_ble:163]: The mosfet status frame isn't supported yet
+[D][sensor:094]: 'tianpower-bms-ble voltage protection bitmask': Sending state 0.00000  with 0 decimals of accuracy
+[D][text_sensor:064]: 'tianpower-bms-ble voltage protection': Sending state ''
+[D][sensor:094]: 'tianpower-bms-ble current protection bitmask': Sending state 0.00000  with 0 decimals of accuracy
+[D][text_sensor:064]: 'tianpower-bms-ble current protection': Sending state ''
+[D][sensor:094]: 'tianpower-bms-ble temperature protection bitmask': Sending state 0.00000  with 0 decimals of accuracy
+[D][text_sensor:064]: 'tianpower-bms-ble temperature protection': Sending state ''
+[D][sensor:094]: 'tianpower-bms-ble error bitmask': Sending state 0.00000  with 0 decimals of accuracy
+[D][text_sensor:064]: 'tianpower-bms-ble errors': Sending state ''
 
-[I][tianpower_bms_ble:302]: Temperature frame received
-[D][tianpower_bms_ble:303]:   55.14.87.00.E6.00.E6.00.E6.00.E6.00.00.00.00.00.00.00.00.AA (20)
+[I][tianpower_bms_ble:400]: Mosfet status frame received
+[D][tianpower_bms_ble:401]:   55.14.85.08.23.00.00.00.00.00.00.00.00.00.00.00.00.00.00.AA (20)
+[D][binary_sensor:036]: 'tianpower-bms-ble charging': Sending state ON
+[D][binary_sensor:036]: 'tianpower-bms-ble discharging': Sending state ON
+[D][binary_sensor:036]: 'tianpower-bms-ble limiting current': Sending state ON
+[I][tianpower_bms_ble:428]: Temperature frame received
+[D][tianpower_bms_ble:429]:   55.14.87.00.E6.00.E6.00.E6.00.E6.00.00.00.00.00.00.00.00.AA (20)
 [D][sensor:094]: 'tianpower-bms-ble temperature 1': Sending state 23.00000 °C with 1 decimals of accuracy
 [D][sensor:094]: 'tianpower-bms-ble temperature 2': Sending state 23.00000 °C with 1 decimals of accuracy
 [D][sensor:094]: 'tianpower-bms-ble temperature 3': Sending state 23.00000 °C with 1 decimals of accuracy
 [D][sensor:094]: 'tianpower-bms-ble temperature 4': Sending state 23.00000 °C with 1 decimals of accuracy
 
-[I][tianpower_bms_ble:332]: Cell voltages frame (chunk 0) received
-[D][tianpower_bms_ble:333]:   55.14.88.0C.C1.0C.D5.0C.D2.0C.D5.0C.C8.0C.D4.0C.C8.0C.D2.AA (20)
+[I][tianpower_bms_ble:458]: Cell voltages frame (chunk 0) received
+[D][tianpower_bms_ble:459]:   55.14.88.0C.C1.0C.D5.0C.D2.0C.D5.0C.C8.0C.D4.0C.C8.0C.D2.AA (20)
 [D][sensor:094]: 'tianpower-bms-ble cell voltage 1': Sending state 3.26500 V with 3 decimals of accuracy
 [D][sensor:094]: 'tianpower-bms-ble cell voltage 2': Sending state 3.28500 V with 3 decimals of accuracy
 [D][sensor:094]: 'tianpower-bms-ble cell voltage 3': Sending state 3.28200 V with 3 decimals of accuracy
@@ -104,8 +114,8 @@ esphome run esp32-example.yaml
 [D][sensor:094]: 'tianpower-bms-ble cell voltage 7': Sending state 3.27200 V with 3 decimals of accuracy
 [D][sensor:094]: 'tianpower-bms-ble cell voltage 8': Sending state 3.28200 V with 3 decimals of accuracy
 
-[I][tianpower_bms_ble:332]: Cell voltages frame (chunk 1) received
-[D][tianpower_bms_ble:333]:   55.14.89.0C.C8.0C.C8.0C.C7.0C.C7.0C.C1.0C.C3.0C.CA.0C.C8.AA (20)
+[I][tianpower_bms_ble:458]: Cell voltages frame (chunk 1) received
+[D][tianpower_bms_ble:459]:   55.14.89.0C.C8.0C.C8.0C.C7.0C.C7.0C.C1.0C.C3.0C.CA.0C.C8.AA (20)
 [D][sensor:094]: 'tianpower-bms-ble cell voltage 9': Sending state 3.27200 V with 3 decimals of accuracy
 [D][sensor:094]: 'tianpower-bms-ble cell voltage 10': Sending state 3.27200 V with 3 decimals of accuracy
 [D][sensor:094]: 'tianpower-bms-ble cell voltage 11': Sending state 3.27100 V with 3 decimals of accuracy
@@ -120,8 +130,8 @@ esphome run esp32-example.yaml
 [D][sensor:094]: 'tianpower-bms-ble min voltage cell': Sending state 1.00000  with 0 decimals of accuracy
 [D][sensor:094]: 'tianpower-bms-ble delta cell voltage': Sending state 0.02000 V with 3 decimals of accuracy
 
-[D][tianpower_bms_ble:175]: The location frame isn't supported yet
-[D][tianpower_bms_ble:179]: The owner frame isn't supported yet
+[D][tianpower_bms_ble:255]: The location frame isn't supported yet
+[D][tianpower_bms_ble:259]: The owner frame isn't supported yet
 ```
 
 ## Protocol
