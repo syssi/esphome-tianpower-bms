@@ -49,18 +49,17 @@ class TianpowerBmsBle : public esphome::ble_client::BLEClientNode, public Pollin
   void set_capacity_remaining_sensor(sensor::Sensor *capacity_remaining_sensor) {
     capacity_remaining_sensor_ = capacity_remaining_sensor;
   }
-  void set_charging_states_bitmask_sensor(sensor::Sensor *charging_states_bitmask_sensor) {
-    charging_states_bitmask_sensor_ = charging_states_bitmask_sensor;
+
+  void set_voltage_protection_bitmask_sensor(sensor::Sensor *voltage_protection_bitmask_sensor) {
+    voltage_protection_bitmask_sensor_ = voltage_protection_bitmask_sensor;
   }
-  void set_discharging_states_bitmask_sensor(sensor::Sensor *discharging_states_bitmask_sensor) {
-    discharging_states_bitmask_sensor_ = discharging_states_bitmask_sensor;
+  void set_current_protection_bitmask_sensor(sensor::Sensor *current_protection_bitmask_sensor) {
+    current_protection_bitmask_sensor_ = current_protection_bitmask_sensor;
   }
-  void set_charging_warnings_bitmask_sensor(sensor::Sensor *charging_warnings_bitmask_sensor) {
-    charging_warnings_bitmask_sensor_ = charging_warnings_bitmask_sensor;
+  void set_temperature_protection_bitmask_sensor(sensor::Sensor *temperature_protection_bitmask_sensor) {
+    temperature_protection_bitmask_sensor_ = temperature_protection_bitmask_sensor;
   }
-  void set_discharging_warnings_bitmask_sensor(sensor::Sensor *discharging_warnings_bitmask_sensor) {
-    discharging_warnings_bitmask_sensor_ = discharging_warnings_bitmask_sensor;
-  }
+  void set_error_bitmask_sensor(sensor::Sensor *error_bitmask_sensor) { error_bitmask_sensor_ = error_bitmask_sensor; }
   void set_state_of_charge_sensor(sensor::Sensor *state_of_charge_sensor) {
     state_of_charge_sensor_ = state_of_charge_sensor;
   }
@@ -114,18 +113,16 @@ class TianpowerBmsBle : public esphome::ble_client::BLEClientNode, public Pollin
   void set_device_model_text_sensor(text_sensor::TextSensor *device_model_text_sensor) {
     device_model_text_sensor_ = device_model_text_sensor;
   }
-  void set_charging_states_text_sensor(text_sensor::TextSensor *charging_states_text_sensor) {
-    charging_states_text_sensor_ = charging_states_text_sensor;
+  void set_voltage_protection_text_sensor(text_sensor::TextSensor *voltage_protection_text_sensor) {
+    voltage_protection_text_sensor_ = voltage_protection_text_sensor;
   }
-  void set_discharging_states_text_sensor(text_sensor::TextSensor *discharging_states_text_sensor) {
-    discharging_states_text_sensor_ = discharging_states_text_sensor;
+  void set_current_protection_text_sensor(text_sensor::TextSensor *current_protection_text_sensor) {
+    current_protection_text_sensor_ = current_protection_text_sensor;
   }
-  void set_charging_warnings_text_sensor(text_sensor::TextSensor *charging_warnings_text_sensor) {
-    charging_warnings_text_sensor_ = charging_warnings_text_sensor;
+  void set_temperature_protection_text_sensor(text_sensor::TextSensor *temperature_protection_text_sensor) {
+    temperature_protection_text_sensor_ = temperature_protection_text_sensor;
   }
-  void set_discharging_warnings_text_sensor(text_sensor::TextSensor *discharging_warnings_text_sensor) {
-    discharging_warnings_text_sensor_ = discharging_warnings_text_sensor;
-  }
+  void set_errors_text_sensor(text_sensor::TextSensor *errors_text_sensor) { errors_text_sensor_ = errors_text_sensor; }
 
   void write_register(uint8_t address, uint16_t value);
   void on_tianpower_bms_ble_data(const uint8_t &handle, const std::vector<uint8_t> &data);
@@ -142,10 +139,10 @@ class TianpowerBmsBle : public esphome::ble_client::BLEClientNode, public Pollin
   sensor::Sensor *charging_power_sensor_;
   sensor::Sensor *discharging_power_sensor_;
   sensor::Sensor *capacity_remaining_sensor_;
-  sensor::Sensor *charging_states_bitmask_sensor_;
-  sensor::Sensor *discharging_states_bitmask_sensor_;
-  sensor::Sensor *charging_warnings_bitmask_sensor_;
-  sensor::Sensor *discharging_warnings_bitmask_sensor_;
+  sensor::Sensor *voltage_protection_bitmask_sensor_;
+  sensor::Sensor *current_protection_bitmask_sensor_;
+  sensor::Sensor *temperature_protection_bitmask_sensor_;
+  sensor::Sensor *error_bitmask_sensor_;
   sensor::Sensor *state_of_charge_sensor_;
   sensor::Sensor *nominal_capacity_sensor_;
   sensor::Sensor *charging_cycles_sensor_;
@@ -162,10 +159,10 @@ class TianpowerBmsBle : public esphome::ble_client::BLEClientNode, public Pollin
 
   text_sensor::TextSensor *software_version_text_sensor_;
   text_sensor::TextSensor *device_model_text_sensor_;
-  text_sensor::TextSensor *charging_states_text_sensor_;
-  text_sensor::TextSensor *discharging_states_text_sensor_;
-  text_sensor::TextSensor *charging_warnings_text_sensor_;
-  text_sensor::TextSensor *discharging_warnings_text_sensor_;
+  text_sensor::TextSensor *voltage_protection_text_sensor_;
+  text_sensor::TextSensor *current_protection_text_sensor_;
+  text_sensor::TextSensor *temperature_protection_text_sensor_;
+  text_sensor::TextSensor *errors_text_sensor_;
 
   struct Cell {
     sensor::Sensor *cell_voltage_sensor_{nullptr};

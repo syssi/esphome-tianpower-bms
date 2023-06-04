@@ -367,10 +367,22 @@ void TianpowerBmsBle::decode_general_info_data_(const std::vector<uint8_t> &data
   //  9    2  0x00 0x00    Cycle count                            1.0    0
   this->publish_state_(this->charging_cycles_sensor_, tianpower_get_16bit(9) * 1.0f);
 
-  //  11   2  0x00 0x00    Voltage Status Bitmask
-  //  13   2  0x00 0x00    Current Status Bitmask
-  //  15   2  0x00 0x00    Temperature Status Bitmask
-  //  17   2  0x00 0x00    Alarm Bitmask
+  //  11   2  0x00 0x00    Voltage protection bitmask
+  this->publish_state_(this->voltage_protection_bitmask_sensor_, tianpower_get_16bit(11) * 1.0f);
+  this->publish_state_(this->voltage_protection_text_sensor_, "");
+
+  //  13   2  0x00 0x00    Current protection bitmask
+  this->publish_state_(this->current_protection_bitmask_sensor_, tianpower_get_16bit(13) * 1.0f);
+  this->publish_state_(this->current_protection_text_sensor_, "");
+
+  //  15   2  0x00 0x00    Temperature protection bitmask
+  this->publish_state_(this->temperature_protection_bitmask_sensor_, tianpower_get_16bit(15) * 1.0f);
+  this->publish_state_(this->temperature_protection_text_sensor_, "");
+
+  //  17   2  0x00 0x00    Error bitmask
+  this->publish_state_(this->error_bitmask_sensor_, tianpower_get_16bit(17) * 1.0f);
+  this->publish_state_(this->errors_sensor_, "");
+
   //  19   1  0xaa         End of frame
 }
 
