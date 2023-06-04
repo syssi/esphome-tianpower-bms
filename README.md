@@ -8,6 +8,8 @@
 
 ESPHome component to monitor a Tianpower Battery Management System via BLE
 
+Credits: Thanks to [@xpinguinx](https://github.com/xpinguinx) for heavily testing the early beta versions and sponsoring the first release!
+
 ## Supported devices
 
 * Tianpower TP-LT55 used in BASEN 48V 200Ah Bluetooth battery bank<br>
