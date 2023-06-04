@@ -68,7 +68,7 @@ sensor:
     current_protection_bitmask:
       name: "${name} current protection bitmask"
     temperature_protection_bitmask:
-        name: "${name} temperature protection bitmask"
+      name: "${name} temperature protection bitmask"
     error_bitmask:
       name: "${name} error bitmask"
     total_voltage:

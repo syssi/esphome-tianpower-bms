@@ -492,9 +492,9 @@ void TianpowerBmsBle::decode_cell_voltages_data_(const uint8_t &chunk, const std
 void TianpowerBmsBle::dump_config() {  // NOLINT(google-readability-function-size,readability-function-size)
   ESP_LOGCONFIG(TAG, "TianpowerBmsBle:");
 
-  LOG_BINARY_SENSOR("", "Balancing", this->balancing_binary_sensor_);
   LOG_BINARY_SENSOR("", "Charging", this->charging_binary_sensor_);
   LOG_BINARY_SENSOR("", "Discharging", this->discharging_binary_sensor_);
+  LOG_BINARY_SENSOR("", "Limiting current", this->limiting_current_binary_sensor_);
 
   LOG_SENSOR("", "Total voltage", this->total_voltage_sensor_);
   LOG_SENSOR("", "Current", this->current_sensor_);

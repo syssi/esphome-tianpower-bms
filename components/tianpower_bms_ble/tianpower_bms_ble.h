@@ -24,9 +24,6 @@ class TianpowerBmsBle : public esphome::ble_client::BLEClientNode, public Pollin
   void update() override;
   float get_setup_priority() const override { return setup_priority::DATA; }
 
-  void set_balancing_binary_sensor(binary_sensor::BinarySensor *balancing_binary_sensor) {
-    balancing_binary_sensor_ = balancing_binary_sensor;
-  }
   void set_charging_binary_sensor(binary_sensor::BinarySensor *charging_binary_sensor) {
     charging_binary_sensor_ = charging_binary_sensor;
   }
@@ -128,7 +125,6 @@ class TianpowerBmsBle : public esphome::ble_client::BLEClientNode, public Pollin
   void on_tianpower_bms_ble_data(const uint8_t &handle, const std::vector<uint8_t> &data);
 
  protected:
-  binary_sensor::BinarySensor *balancing_binary_sensor_;
   binary_sensor::BinarySensor *charging_binary_sensor_;
   binary_sensor::BinarySensor *discharging_binary_sensor_;
   binary_sensor::BinarySensor *limiting_current_binary_sensor_;
