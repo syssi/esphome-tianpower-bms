@@ -9,18 +9,15 @@ DEPENDENCIES = ["tianpower_bms_ble"]
 
 CODEOWNERS = ["@syssi"]
 
-CONF_BALANCING = "balancing"
 CONF_CHARGING = "charging"
 CONF_DISCHARGING = "discharging"
 CONF_LIMITING_CURRENT = "limiting_current"
 
-ICON_BALANCING = "mdi:battery-heart-variant"
 ICON_CHARGING = "mdi:battery-charging"
 ICON_DISCHARGING = "mdi:power-plug"
 ICON_LIMITING_CURRENT = "mdi:car-speed-limiter"
 
 BINARY_SENSORS = [
-    # CONF_BALANCING,
     CONF_CHARGING,
     CONF_DISCHARGING,
     CONF_LIMITING_CURRENT,
@@ -29,12 +26,6 @@ BINARY_SENSORS = [
 CONFIG_SCHEMA = cv.Schema(
     {
         cv.GenerateID(CONF_TIANPOWER_BMS_BLE_ID): cv.use_id(TianpowerBmsBle),
-        cv.Optional(CONF_BALANCING): binary_sensor.BINARY_SENSOR_SCHEMA.extend(
-            {
-                cv.GenerateID(): cv.declare_id(binary_sensor.BinarySensor),
-                cv.Optional(CONF_ICON, default=ICON_BALANCING): cv.icon,
-            }
-        ),
         cv.Optional(CONF_CHARGING): binary_sensor.BINARY_SENSOR_SCHEMA.extend(
             {
                 cv.GenerateID(): cv.declare_id(binary_sensor.BinarySensor),

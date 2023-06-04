@@ -63,6 +63,14 @@ binary_sensor:
 sensor:
   - platform: tianpower_bms_ble
     tianpower_bms_ble_id: bms0
+    voltage_protection_bitmask:
+      name: "${name} voltage protection bitmask"
+    current_protection_bitmask:
+      name: "${name} current protection bitmask"
+    temperature_protection_bitmask:
+      name: "${name} temperature protection bitmask"
+    error_bitmask:
+      name: "${name} error bitmask"
     total_voltage:
       name: "${name} total voltage"
     current:
@@ -149,3 +157,11 @@ text_sensor:
       name: "${name} software version"
     device_model:
       name: "${name} device model"
+    voltage_protection:
+      name: "${name} voltage protection"
+    current_protection:
+      name: "${name} current protection"
+    temperature_protection:
+      name: "${name} temperature protection"
+    errors:
+      name: "${name} errors"

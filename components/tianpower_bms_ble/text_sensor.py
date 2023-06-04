@@ -11,27 +11,25 @@ CODEOWNERS = ["@syssi"]
 
 CONF_SOFTWARE_VERSION = "software_version"
 CONF_DEVICE_MODEL = "device_model"
+CONF_VOLTAGE_PROTECTION = "voltage_protection"
+CONF_CURRENT_PROTECTION = "current_protection"
+CONF_TEMPERATURE_PROTECTION = "temperature_protection"
+CONF_ERRORS = "errors"
 
 ICON_DEVICE_MODEL = "mdi:chip"
 ICON_SOFTWARE_VERSION = "mdi:numeric"
-
-CONF_CHARGING_STATES = "charging_states"
-CONF_DISCHARGING_STATES = "discharging_states"
-CONF_CHARGING_WARNINGS = "charging_warnings"
-CONF_DISCHARGING_WARNINGS = "discharging_warnings"
-
-ICON_CHARGING_STATES = "mdi:alert-circle-outline"
-ICON_DISCHARGING_STATES = "mdi:alert-circle-outline"
-ICON_CHARGING_WARNINGS = "mdi:alert-circle-outline"
-ICON_DISCHARGING_WARNINGS = "mdi:alert-circle-outline"
+ICON_VOLTAGE_PROTECTION = "mdi:alert-circle-outline"
+ICON_CURRENT_PROTECTION = "mdi:alert-circle-outline"
+ICON_TEMPERATURE_PROTECTION = "mdi:alert-circle-outline"
+ICON_ERRORS = "mdi:alert-circle-outline"
 
 TEXT_SENSORS = [
     CONF_SOFTWARE_VERSION,
     CONF_DEVICE_MODEL,
-    # CONF_CHARGING_STATES,
-    # CONF_DISCHARGING_STATES,
-    # CONF_CHARGING_WARNINGS,
-    # CONF_DISCHARGING_WARNINGS,
+    CONF_VOLTAGE_PROTECTION,
+    CONF_CURRENT_PROTECTION,
+    CONF_TEMPERATURE_PROTECTION,
+    CONF_ERRORS,
 ]
 
 CONFIG_SCHEMA = cv.Schema(
@@ -49,28 +47,28 @@ CONFIG_SCHEMA = cv.Schema(
                 cv.Optional(CONF_ICON, default=ICON_DEVICE_MODEL): cv.icon,
             }
         ),
-        cv.Optional(CONF_CHARGING_STATES): text_sensor.TEXT_SENSOR_SCHEMA.extend(
+        cv.Optional(CONF_VOLTAGE_PROTECTION): text_sensor.TEXT_SENSOR_SCHEMA.extend(
             {
                 cv.GenerateID(): cv.declare_id(text_sensor.TextSensor),
-                cv.Optional(CONF_ICON, default=ICON_CHARGING_STATES): cv.icon,
+                cv.Optional(CONF_ICON, default=ICON_VOLTAGE_PROTECTION): cv.icon,
             }
         ),
-        cv.Optional(CONF_DISCHARGING_STATES): text_sensor.TEXT_SENSOR_SCHEMA.extend(
+        cv.Optional(CONF_CURRENT_PROTECTION): text_sensor.TEXT_SENSOR_SCHEMA.extend(
             {
                 cv.GenerateID(): cv.declare_id(text_sensor.TextSensor),
-                cv.Optional(CONF_ICON, default=ICON_DISCHARGING_STATES): cv.icon,
+                cv.Optional(CONF_ICON, default=ICON_CURRENT_PROTECTION): cv.icon,
             }
         ),
-        cv.Optional(CONF_CHARGING_WARNINGS): text_sensor.TEXT_SENSOR_SCHEMA.extend(
+        cv.Optional(CONF_TEMPERATURE_PROTECTION): text_sensor.TEXT_SENSOR_SCHEMA.extend(
             {
                 cv.GenerateID(): cv.declare_id(text_sensor.TextSensor),
-                cv.Optional(CONF_ICON, default=ICON_CHARGING_WARNINGS): cv.icon,
+                cv.Optional(CONF_ICON, default=ICON_TEMPERATURE_PROTECTION): cv.icon,
             }
         ),
-        cv.Optional(CONF_DISCHARGING_WARNINGS): text_sensor.TEXT_SENSOR_SCHEMA.extend(
+        cv.Optional(CONF_ERRORS): text_sensor.TEXT_SENSOR_SCHEMA.extend(
             {
                 cv.GenerateID(): cv.declare_id(text_sensor.TextSensor),
-                cv.Optional(CONF_ICON, default=ICON_DISCHARGING_WARNINGS): cv.icon,
+                cv.Optional(CONF_ICON, default=ICON_ERRORS): cv.icon,
             }
         ),
     }

@@ -31,14 +31,13 @@ CONF_TOTAL_VOLTAGE = "total_voltage"
 CONF_CHARGING_POWER = "charging_power"
 CONF_DISCHARGING_POWER = "discharging_power"
 CONF_CAPACITY_REMAINING = "capacity_remaining"
-CONF_CHARGING_STATES_BITMASK = "charging_states_bitmask"
-CONF_DISCHARGING_STATES_BITMASK = "discharging_states_bitmask"
-CONF_CHARGING_WARNINGS_BITMASK = "charging_warnings_bitmask"
-CONF_DISCHARGING_WARNINGS_BITMASK = "discharging_warnings_bitmask"
+
+CONF_VOLTAGE_PROTECTION_BITMASK = "voltage_protection_bitmask"
+CONF_CURRENT_PROTECTION_BITMASK = "current_protection_bitmask"
+CONF_TEMPERATURE_PROTECTION_BITMASK = "temperature_protection_bitmask"
+CONF_ERROR_BITMASK = "error_bitmask"
 CONF_STATE_OF_CHARGE = "state_of_charge"
 CONF_NOMINAL_CAPACITY = "nominal_capacity"
-CONF_REAL_CAPACITY = "real_capacity"
-CONF_SERIAL_NUMBER = "serial_number"
 CONF_CHARGING_CYCLES = "charging_cycles"
 CONF_MIN_CELL_VOLTAGE = "min_cell_voltage"
 CONF_MAX_CELL_VOLTAGE = "max_cell_voltage"
@@ -95,12 +94,10 @@ ICON_MIN_CELL_VOLTAGE = "mdi:battery-minus-outline"
 ICON_MAX_CELL_VOLTAGE = "mdi:battery-plus-outline"
 ICON_MIN_VOLTAGE_CELL = "mdi:battery-minus-outline"
 ICON_MAX_VOLTAGE_CELL = "mdi:battery-plus-outline"
-ICON_CHARGING_STATES_BITMASK = "mdi:alert-circle-outline"
-ICON_DISCHARGING_STATES_BITMASK = "mdi:alert-circle-outline"
-ICON_CHARGING_WARNINGS_BITMASK = "mdi:alert-circle-outline"
-ICON_DISCHARGING_WARNINGS_BITMASK = "mdi:alert-circle-outline"
-ICON_REAL_CAPACITY = "mdi:battery-high"
-ICON_SERIAL_NUMBER = "mdi:numeric"
+ICON_VOLTAGE_PROTECTION_BITMASK = "mdi:alert-circle-outline"
+ICON_CURRENT_PROTECTION_BITMASK = "mdi:alert-circle-outline"
+ICON_TEMPERATURE_PROTECTION_BITMASK = "mdi:alert-circle-outline"
+ICON_ERROR_BITMASK = "mdi:alert-circle-outline"
 ICON_STATE_OF_HEALTH = "mdi:heart-flash"
 
 UNIT_AMPERE_HOURS = "Ah"
@@ -150,10 +147,10 @@ SENSORS = [
     CONF_CHARGING_POWER,
     CONF_DISCHARGING_POWER,
     CONF_CAPACITY_REMAINING,
-    # CONF_CHARGING_STATES_BITMASK,
-    # CONF_DISCHARGING_STATES_BITMASK,
-    # CONF_CHARGING_WARNINGS_BITMASK,
-    # CONF_DISCHARGING_WARNINGS_BITMASK,
+    CONF_VOLTAGE_PROTECTION_BITMASK,
+    CONF_CURRENT_PROTECTION_BITMASK,
+    CONF_TEMPERATURE_PROTECTION_BITMASK,
+    CONF_ERROR_BITMASK,
     CONF_STATE_OF_CHARGE,
     CONF_NOMINAL_CAPACITY,
     CONF_CHARGING_CYCLES,
@@ -215,30 +212,30 @@ CONFIG_SCHEMA = cv.Schema(
             device_class=DEVICE_CLASS_EMPTY,
             state_class=STATE_CLASS_MEASUREMENT,
         ),
-        cv.Optional(CONF_CHARGING_STATES_BITMASK): sensor.sensor_schema(
+        cv.Optional(CONF_VOLTAGE_PROTECTION_BITMASK): sensor.sensor_schema(
             unit_of_measurement=UNIT_EMPTY,
-            icon=ICON_CHARGING_STATES_BITMASK,
+            icon=ICON_VOLTAGE_PROTECTION_BITMASK,
             accuracy_decimals=0,
             device_class=DEVICE_CLASS_EMPTY,
             state_class=STATE_CLASS_MEASUREMENT,
         ),
-        cv.Optional(CONF_DISCHARGING_STATES_BITMASK): sensor.sensor_schema(
+        cv.Optional(CONF_CURRENT_PROTECTION_BITMASK): sensor.sensor_schema(
             unit_of_measurement=UNIT_EMPTY,
-            icon=ICON_DISCHARGING_STATES_BITMASK,
+            icon=ICON_CURRENT_PROTECTION_BITMASK,
             accuracy_decimals=0,
             device_class=DEVICE_CLASS_EMPTY,
             state_class=STATE_CLASS_MEASUREMENT,
         ),
-        cv.Optional(CONF_CHARGING_WARNINGS_BITMASK): sensor.sensor_schema(
+        cv.Optional(CONF_TEMPERATURE_PROTECTION_BITMASK): sensor.sensor_schema(
             unit_of_measurement=UNIT_EMPTY,
-            icon=ICON_CHARGING_WARNINGS_BITMASK,
+            icon=ICON_VOLTAGE_PROTECTION_BITMASK,
             accuracy_decimals=0,
             device_class=DEVICE_CLASS_EMPTY,
             state_class=STATE_CLASS_MEASUREMENT,
         ),
-        cv.Optional(CONF_DISCHARGING_WARNINGS_BITMASK): sensor.sensor_schema(
+        cv.Optional(CONF_ERROR_BITMASK): sensor.sensor_schema(
             unit_of_measurement=UNIT_EMPTY,
-            icon=ICON_DISCHARGING_WARNINGS_BITMASK,
+            icon=ICON_ERROR_BITMASK,
             accuracy_decimals=0,
             device_class=DEVICE_CLASS_EMPTY,
             state_class=STATE_CLASS_MEASUREMENT,
