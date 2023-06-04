@@ -160,7 +160,7 @@ void TianpowerBmsBle::on_tianpower_bms_ble_data(const uint8_t &handle, const std
       this->decode_general_info_data_(data);
       break;
     case TIANPOWER_FRAME_TYPE_MOSFET_STATUS:
-      ESP_LOGD(TAG, "The mosfet status frame isn't supported yet");
+      this->decode_mosfet_status_data_(data);
       break;
     case TIANPOWER_FRAME_TYPE_TEMPERATURES:
       this->decode_temperature_data_(data);
@@ -291,6 +291,34 @@ void TianpowerBmsBle::decode_general_info_data_(const std::vector<uint8_t> &data
   //  13   2  0x00 0x00    Current Status Bitmask
   //  15   2  0x00 0x00    Temperature Status Bitmask
   //  17   2  0x00 0x00    Alarm Bitmask
+  //  19   1  0xaa         End of frame
+}
+
+void TianpowerBmsBle::decode_mosfet_status_data_(const std::vector<uint8_t> &data) {
+  auto tianpower_get_16bit = [&](size_t i) -> uint16_t {
+    return (uint16_t(data[i + 0]) << 8) | (uint16_t(data[i + 1]) << 0);
+  };
+
+  ESP_LOGI(TAG, "Mosfet status frame received");
+  ESP_LOGD(TAG, "  %s", format_hex_pretty(&data.front(), data.size()).c_str());
+
+  // Byte Len Payload      Description                      Unit  Precision
+  //  0    1  0x55         Start of frame
+  //  1    1  0x14         Frame type (Response)
+  //  2    1  0x85         Address
+  //  3    2  0x08 0x23    Mosfet Status Bitmask (0b100000100011)
+  this->publish_state_(this->charging_binary_sensor_, (bool) check_bit_(tianpower_get_16bit(3), 1));
+  this->publish_state_(this->discharging_binary_sensor_, (bool) check_bit_(tianpower_get_16bit(3), 2));
+  this->publish_state_(this->limiting_current_binary_sensor_,
+                       check_bit_(tianpower_get_16bit(3), 16) || check_bit_(tianpower_get_16bit(3), 32));
+
+  //  5    2  0x00 0x00    Unknown Bitmask
+  //  7    2  0x00 0x00    Unknown Bitmask
+  //  9    2  0x00 0x00    High Alarm Bitmask
+  //  11   2  0x00 0x00    Low Alarm Bitmask
+  //  13   2  0x00 0x00    Balancing? Bitmask
+  //  15   2  0x00 0x00    Unused
+  //  17   2  0x00 0x00    Unused
   //  19   1  0xaa         End of frame
 }
 
