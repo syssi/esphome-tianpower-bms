@@ -381,7 +381,7 @@ void TianpowerBmsBle::decode_general_info_data_(const std::vector<uint8_t> &data
 
   //  17   2  0x00 0x00    Error bitmask
   this->publish_state_(this->error_bitmask_sensor_, tianpower_get_16bit(17) * 1.0f);
-  this->publish_state_(this->errors_sensor_, "");
+  this->publish_state_(this->errors_text_sensor_, "");
 
   //  19   1  0xaa         End of frame
 }
@@ -551,10 +551,10 @@ void TianpowerBmsBle::dump_config() {  // NOLINT(google-readability-function-siz
   LOG_SENSOR("", "Cell Voltage 23", this->cells_[22].cell_voltage_sensor_);
   LOG_SENSOR("", "Cell Voltage 24", this->cells_[23].cell_voltage_sensor_);
 
-  LOG_TEXT_SENSOR("", "Charging states", this->charging_states_text_sensor_);
-  LOG_TEXT_SENSOR("", "Discharging states", this->discharging_states_text_sensor_);
-  LOG_TEXT_SENSOR("", "Charging warnings", this->charging_warnings_text_sensor_);
-  LOG_TEXT_SENSOR("", "Discharging warnings", this->discharging_warnings_text_sensor_);
+  LOG_TEXT_SENSOR("", "Voltage protection", this->voltage_protection_text_sensor_);
+  LOG_TEXT_SENSOR("", "Current protection", this->current_protection_text_sensor_);
+  LOG_TEXT_SENSOR("", "Temperature protection", this->temperature_protection_text_sensor_);
+  LOG_TEXT_SENSOR("", "Errors", this->errors_text_sensor_);
 }
 
 void TianpowerBmsBle::publish_state_(binary_sensor::BinarySensor *binary_sensor, const bool &state) {
