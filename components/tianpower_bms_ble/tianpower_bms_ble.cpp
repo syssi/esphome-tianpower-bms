@@ -40,7 +40,7 @@ static const uint8_t TIANPOWER_COMMAND_QUEUE[TIANPOWER_COMMAND_QUEUE_SIZE] = {
 };
 
 static const uint8_t VOLTAGE_PROTECTION_ERRORS_SIZE = 16;
-static const char *const VOLTAGE_PROTECTION_ERRORS[VOLTAGE_ERRORS_SIZE] = {
+static const char *const VOLTAGE_PROTECTION_ERRORS[VOLTAGE_PROTECTION_ERRORS_SIZE] = {
     "Cell overvoltage protection",         // 0000 0000 0000 0001
     "Cell undervoltage protection",        // 0000 0000 0000 0010
     "Pack overvoltage protection",         // 0000 0000 0000 0100
@@ -60,7 +60,7 @@ static const char *const VOLTAGE_PROTECTION_ERRORS[VOLTAGE_ERRORS_SIZE] = {
 };
 
 static const uint8_t TEMPERATURE_PROTECTION_ERRORS_SIZE = 16;
-static const char *const TEMPERATURE_PROTECTION_ERRORS[VOLTAGE_ERRORS_SIZE] = {
+static const char *const TEMPERATURE_PROTECTION_ERRORS[TEMPERATURE_PROTECTION_ERRORS_SIZE] = {
     "Charge over temperature protection",      // 0000 0000 0000 0001
     "Charge under temperature protection",     // 0000 0000 0000 0010
     "Discharge over temperature protection",   // 0000 0000 0000 0100
@@ -80,7 +80,7 @@ static const char *const TEMPERATURE_PROTECTION_ERRORS[VOLTAGE_ERRORS_SIZE] = {
 };
 
 static const uint8_t CURRENT_PROTECTION_ERRORS_SIZE = 16;
-static const char *const CURRENT_PROTECTION_ERRORS[VOLTAGE_ERRORS_SIZE] = {
+static const char *const CURRENT_PROTECTION_ERRORS[CURRENT_PROTECTION_ERRORS_SIZE] = {
     "Charge overcurrent protection",       // 0000 0000 0000 0001
     "Short circuit protection",            // 0000 0000 0000 0010
     "Discharge overcurrent 1 protection",  // 0000 0000 0000 0100
@@ -99,8 +99,8 @@ static const char *const CURRENT_PROTECTION_ERRORS[VOLTAGE_ERRORS_SIZE] = {
     "Reserved",                            // 1000 0000 0000 0000
 };
 
-static const uint8_t ALARMS_SIZE = 16;
-static const char *const ALARMS[ALARMS_SIZE] = {
+static const uint8_t ERRORS_SIZE = 16;
+static const char *const ERRORS[ERRORS_SIZE] = {
     "Cell voltage differential alarm",  // 0000 0000 0000 0001
     "Charge MOS damage alarm",          // 0000 0000 0000 0010
     "External SD card failure alarm",   // 0000 0000 0000 0100
@@ -369,19 +369,25 @@ void TianpowerBmsBle::decode_general_info_data_(const std::vector<uint8_t> &data
 
   //  11   2  0x00 0x00    Voltage protection bitmask
   this->publish_state_(this->voltage_protection_bitmask_sensor_, tianpower_get_16bit(11) * 1.0f);
-  this->publish_state_(this->voltage_protection_text_sensor_, "");
+  this->publish_state_(
+      this->voltage_protection_text_sensor_,
+      bitmask_to_string_(VOLTAGE_PROTECTION_ERRORS, VOLTAGE_PROTECTION_ERRORS_SIZE, tianpower_get_16bit(11)));
 
   //  13   2  0x00 0x00    Current protection bitmask
   this->publish_state_(this->current_protection_bitmask_sensor_, tianpower_get_16bit(13) * 1.0f);
-  this->publish_state_(this->current_protection_text_sensor_, "");
+  this->publish_state_(
+      this->current_protection_text_sensor_,
+      bitmask_to_string_(CURRENT_PROTECTION_ERRORS, CURRENT_PROTECTION_ERRORS_SIZE, tianpower_get_16bit(13)));
 
   //  15   2  0x00 0x00    Temperature protection bitmask
   this->publish_state_(this->temperature_protection_bitmask_sensor_, tianpower_get_16bit(15) * 1.0f);
-  this->publish_state_(this->temperature_protection_text_sensor_, "");
+  this->publish_state_(
+      this->temperature_protection_text_sensor_,
+      bitmask_to_string_(TEMPERATURE_PROTECTION_ERRORS, TEMPERATURE_PROTECTION_ERRORS_SIZE, tianpower_get_16bit(15)));
 
   //  17   2  0x00 0x00    Error bitmask
   this->publish_state_(this->error_bitmask_sensor_, tianpower_get_16bit(17) * 1.0f);
-  this->publish_state_(this->errors_text_sensor_, "");
+  this->publish_state_(this->errors_text_sensor_, bitmask_to_string_(ERRORS, ERRORS_SIZE, tianpower_get_16bit(17)));
 
   //  19   1  0xaa         End of frame
 }
@@ -502,10 +508,10 @@ void TianpowerBmsBle::dump_config() {  // NOLINT(google-readability-function-siz
   LOG_SENSOR("", "Charging power", this->charging_power_sensor_);
   LOG_SENSOR("", "Discharging power", this->discharging_power_sensor_);
   LOG_SENSOR("", "Capacity remaining", this->capacity_remaining_sensor_);
-  LOG_SENSOR("", "Charging states bitmask", this->charging_states_bitmask_sensor_);
-  LOG_SENSOR("", "Discharging states bitmask", this->discharging_states_bitmask_sensor_);
-  LOG_SENSOR("", "Charging warnings bitmask", this->charging_warnings_bitmask_sensor_);
-  LOG_SENSOR("", "Discharging warnings bitmask", this->discharging_warnings_bitmask_sensor_);
+  LOG_SENSOR("", "Voltage protection bitmask", this->voltage_protection_bitmask_sensor_);
+  LOG_SENSOR("", "Current protection bitmask", this->current_protection_bitmask_sensor_);
+  LOG_SENSOR("", "Temperature protection bitmask", this->temperature_protection_bitmask_sensor_);
+  LOG_SENSOR("", "Error bitmask", this->error_bitmask_sensor_);
   LOG_SENSOR("", "State of charge", this->state_of_charge_sensor_);
   LOG_SENSOR("", "Nominal capacity", this->nominal_capacity_sensor_);
   LOG_SENSOR("", "Charging cycles", this->charging_cycles_sensor_);
@@ -602,6 +608,23 @@ bool TianpowerBmsBle::send_command_(uint8_t function) {
   }
 
   return (status == 0);
+}
+
+std::string TianpowerBmsBle::bitmask_to_string_(const char *const messages[], const uint8_t &messages_size,
+                                                const uint16_t &mask) {
+  std::string values = "";
+  if (mask) {
+    for (int i = 0; i < messages_size; i++) {
+      if (mask & (1 << i)) {
+        values.append(messages[i]);
+        values.append(";");
+      }
+    }
+    if (!values.empty()) {
+      values.pop_back();
+    }
+  }
+  return values;
 }
 
 }  // namespace tianpower_bms_ble

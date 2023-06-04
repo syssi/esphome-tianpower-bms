@@ -190,8 +190,9 @@ class TianpowerBmsBle : public esphome::ble_client::BLEClientNode, public Pollin
   void publish_state_(sensor::Sensor *sensor, float value);
   void publish_state_(text_sensor::TextSensor *text_sensor, const std::string &state);
   bool send_command_(uint8_t function);
+  std::string bitmask_to_string_(const char *const values[], const uint8_t &values_size, const uint16_t &mask);
 
-  bool check_bit_(uint8_t mask, uint8_t flag) { return (mask & flag) == flag; }
+  bool check_bit_(uint16_t mask, uint16_t flag) { return (mask & flag) == flag; }
 };
 
 }  // namespace tianpower_bms_ble
