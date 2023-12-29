@@ -490,6 +490,9 @@ void TianpowerBmsBle::decode_cell_voltages_data_(const uint8_t &chunk, const std
     this->publish_state_(this->max_voltage_cell_sensor_, (float) this->max_voltage_cell_);
     this->publish_state_(this->min_voltage_cell_sensor_, (float) this->min_voltage_cell_);
     this->publish_state_(this->delta_cell_voltage_sensor_, this->max_cell_voltage_ - this->min_cell_voltage_);
+
+    this->min_cell_voltage_ = 100.0f;
+    this->max_cell_voltage_ = -100.0f;
   }
 
   //  19   1  0xaa         End of frame
