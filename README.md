@@ -15,7 +15,10 @@ Credits: Thanks to [@xpinguinx](https://github.com/xpinguinx) for heavily testin
 * Tianpower TP-LT55 used in BASEN 48V 200Ah Bluetooth battery bank<br>
   Probably advertised via BLE as `TP_123456`
 
-* Tianpower BMS used in BASEN 10KW Wall-Mounted 51.2V 200Ah battery bank [#16](https://github.com/syssi/esphome-tianpower-bms/issues/16) <br>
+* Tianpower TP-LT55AT used in BASEN 48V 280Ah/300Ah Bluetooth battery bank ([#17](https://github.com/syssi/esphome-tianpower-bms/issues/17)) <br>
+  Probably advertised via BLE as `TP_123456`
+
+* Tianpower BMS used in BASEN 10KW Wall-Mounted 51.2V 200Ah battery bank ([#16](https://github.com/syssi/esphome-tianpower-bms/issues/16)) <br>
   Probably advertised via BLE as `TP_BSTBD-23I-401`
 
 ## Requirements
