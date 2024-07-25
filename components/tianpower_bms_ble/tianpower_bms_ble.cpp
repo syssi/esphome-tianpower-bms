@@ -207,15 +207,9 @@ void TianpowerBmsBle::update() {
     return;
   }
 
-  // Loop through all commands if connected
-  if (this->next_command_ != TIANPOWER_COMMAND_QUEUE_SIZE) {
-    ESP_LOGW(TAG,
-             "Command queue (%d of %d) was not completely processed. "
-             "Please increase the update_interval if you see this warning frequently",
-             this->next_command_ + 1, TIANPOWER_COMMAND_QUEUE_SIZE);
+  for (uint8_t command : TIANPOWER_COMMAND_QUEUE) {
+    this->send_command_(command);
   }
-  this->next_command_ = 0;
-  this->send_command_(TIANPOWER_COMMAND_QUEUE[this->next_command_++ % TIANPOWER_COMMAND_QUEUE_SIZE]);
 }
 
 void TianpowerBmsBle::on_tianpower_bms_ble_data(const uint8_t &handle, const std::vector<uint8_t> &data) {
@@ -261,11 +255,6 @@ void TianpowerBmsBle::on_tianpower_bms_ble_data(const uint8_t &handle, const std
     default:
       ESP_LOGW(TAG, "Unhandled response received (frame_type 0x%02X): %s", frame_type,
                format_hex_pretty(&data.front(), data.size()).c_str());
-  }
-
-  // Send next command after each received frame
-  if (this->next_command_ < TIANPOWER_COMMAND_QUEUE_SIZE) {
-    this->send_command_(TIANPOWER_COMMAND_QUEUE[this->next_command_++ % TIANPOWER_COMMAND_QUEUE_SIZE]);
   }
 }
 
