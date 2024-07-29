@@ -19,13 +19,13 @@ Credits: Thanks to [@xpinguinx](https://github.com/xpinguinx) for heavily testin
   Probably advertised via BLE as `TP_123456`
 
 * Tianpower BMS used in BASEN 10KW Wall-Mounted 51.2V 200Ah battery bank ([#16](https://github.com/syssi/esphome-tianpower-bms/issues/16))<br>
-  Probably advertised via BLE as `TP_BSTBD-23I-401`
+  Probably advertised via BLE as `TP_BSTBD-23I-xxx`
 
 * Tianpower TP-LT52 (SW 0.1.31) used in BASENGREEN 10kWh Wall-Mounted 51.2V 200Ah battery bank ([#19](https://github.com/syssi/esphome-tianpower-bms/discussions/19))<br>
-  Probably advertised via BLE as `TP_BSTBD-23F-304`
+  Probably advertised via BLE as `TP_BSTBD-23F-xxx`
 
 * Tianpower TP-LT55AT (BN-HES16S48V200LT55A-V1.1.2) used in BASENGREEN BR-OW-LV 14.33kWh 51.2V 280Ah battery bank ([#22](https://github.com/syssi/esphome-tianpower-bms/discussions/22))<br>
-  Probably advertised via BLE as `TP_BSTBD-24C-0232`
+  Probably advertised via BLE as `TP_BSTBD-24C-xxxx`
 
 ## Requirements
 
