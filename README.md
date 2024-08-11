@@ -28,7 +28,7 @@ Credits: Thanks to [@xpinguinx](https://github.com/xpinguinx) for heavily testin
   Probably advertised via BLE as `TP_BSTBD-24C-xxxx`
 
 * Tianpower TP-LT55A in BASENGREEN 48V DIY KITS V2 battery bank ([#31](https://github.com/syssi/esphome-tianpower-bms/issues/31))<br>
-  Probably advertised via BLE as `TP_????`
+  Probably advertised via BLE as `TP_123456`
 
 ## Requirements
 
