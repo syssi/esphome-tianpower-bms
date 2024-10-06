@@ -2,7 +2,7 @@ substitutions:
   name: tianpower-bms-ble
   bms0: "${name} device0"
   bms1: "${name} device1"
-  device_description: "Monitor a Tianpower Battery Management System via BLE"
+  device_description: "Monitor two Tianpower Battery Management Systems via BLE"
   external_components_source: github://syssi/esphome-tianpower-bms@main
   bms0_mac_address: 90:A6:BF:93:A0:69
   bms1_mac_address: 90:A6:BF:93:A0:70
