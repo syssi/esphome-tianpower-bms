@@ -308,13 +308,13 @@ void TianpowerBmsBle::decode_status_data_(const std::vector<uint8_t> &data) {
   this->publish_state_(this->total_voltage_sensor_, total_voltage);
 
   //  7    2  0x01 0x18    Average temperature               °C   0.1f   28.0°C
-  this->publish_state_(this->average_temperature_sensor_, tianpower_get_16bit(7) * 0.1f);
+  this->publish_state_(this->average_temperature_sensor_, ((int16_t) tianpower_get_16bit(7)) * 0.1f);
 
   //  9    2  0x00 0xe6    Ambient temperature               °C   0.1f   23.0°C
-  this->publish_state_(this->ambient_temperature_sensor_, tianpower_get_16bit(9) * 0.1f);
+  this->publish_state_(this->ambient_temperature_sensor_, ((int16_t) tianpower_get_16bit(9)) * 0.1f);
 
   //  11   2  0x00 0xf0    Mosfet temperature                °C   0.1f   24.0°C
-  this->publish_state_(this->mosfet_temperature_sensor_, tianpower_get_16bit(11) * 0.1f);
+  this->publish_state_(this->mosfet_temperature_sensor_, ((int16_t) tianpower_get_16bit(11)) * 0.1f);
 
   //  13   2  0x00 0x00    Current (signed)                  A    0.01f
   float current = ((int16_t) tianpower_get_16bit(13)) * 0.01f;
