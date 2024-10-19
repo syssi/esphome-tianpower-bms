@@ -64,7 +64,7 @@ mqtt_password: MY_MQTT_PASSWORD
 EOF
 
 # Validate the configuration, create a binary, upload it, and start logs
-esphome run esp32-example.yaml
+esphome run esp32-ble-example.yaml
 
 ```
 
