@@ -1,7 +1,7 @@
 import esphome.codegen as cg
 from esphome.components import binary_sensor
 import esphome.config_validation as cv
-from esphome.const import CONF_ICON, CONF_ID
+from esphome.const import CONF_ID
 
 from . import CONF_TIANPOWER_BMS_BLE_ID, TianpowerBmsBle
 
@@ -13,10 +13,6 @@ CONF_CHARGING = "charging"
 CONF_DISCHARGING = "discharging"
 CONF_LIMITING_CURRENT = "limiting_current"
 
-ICON_CHARGING = "mdi:battery-charging"
-ICON_DISCHARGING = "mdi:power-plug"
-ICON_LIMITING_CURRENT = "mdi:car-speed-limiter"
-
 BINARY_SENSORS = [
     CONF_CHARGING,
     CONF_DISCHARGING,
@@ -26,23 +22,14 @@ BINARY_SENSORS = [
 CONFIG_SCHEMA = cv.Schema(
     {
         cv.GenerateID(CONF_TIANPOWER_BMS_BLE_ID): cv.use_id(TianpowerBmsBle),
-        cv.Optional(CONF_CHARGING): binary_sensor.BINARY_SENSOR_SCHEMA.extend(
-            {
-                cv.GenerateID(): cv.declare_id(binary_sensor.BinarySensor),
-                cv.Optional(CONF_ICON, default=ICON_CHARGING): cv.icon,
-            }
+        cv.Optional(CONF_CHARGING): binary_sensor.binary_sensor_schema(
+            icon="mdi:battery-charging"
         ),
-        cv.Optional(CONF_DISCHARGING): binary_sensor.BINARY_SENSOR_SCHEMA.extend(
-            {
-                cv.GenerateID(): cv.declare_id(binary_sensor.BinarySensor),
-                cv.Optional(CONF_ICON, default=ICON_DISCHARGING): cv.icon,
-            }
+        cv.Optional(CONF_DISCHARGING): binary_sensor.binary_sensor_schema(
+            icon="mdi:power-plug"
         ),
-        cv.Optional(CONF_LIMITING_CURRENT): binary_sensor.BINARY_SENSOR_SCHEMA.extend(
-            {
-                cv.GenerateID(): cv.declare_id(binary_sensor.BinarySensor),
-                cv.Optional(CONF_ICON, default=ICON_LIMITING_CURRENT): cv.icon,
-            }
+        cv.Optional(CONF_LIMITING_CURRENT): binary_sensor.binary_sensor_schema(
+            icon="mdi:car-speed-limiter"
         ),
     }
 )
