@@ -61,6 +61,8 @@ cd esphome-tianpower-bms
 
 # Create a secrets.yaml containing some setup specific secrets
 cat > secrets.yaml <<EOF
+bms0_mac_address: MY_BMS_MAC_ADDRESS
+
 wifi_ssid: MY_WIFI_SSID
 wifi_password: MY_WIFI_PASSWORD
 

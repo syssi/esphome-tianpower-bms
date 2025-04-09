@@ -2,7 +2,7 @@ substitutions:
   name: tianpower-bms-ble
   device_description: "Monitor a Tianpower Battery Management System via BLE"
   external_components_source: github://syssi/esphome-tianpower-bms@main
-  mac_address: 90:A6:BF:93:A0:69
+  mac_address: !secret bms0_mac_address
 
 esphome:
   name: ${name}
