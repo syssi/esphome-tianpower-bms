@@ -1,7 +1,7 @@
 import esphome.codegen as cg
 from esphome.components import text_sensor
 import esphome.config_validation as cv
-from esphome.const import CONF_ICON, CONF_ID
+from esphome.const import CONF_ID
 
 from . import CONF_TIANPOWER_BMS_BLE_ID, TianpowerBmsBle
 
@@ -35,41 +35,23 @@ TEXT_SENSORS = [
 CONFIG_SCHEMA = cv.Schema(
     {
         cv.GenerateID(CONF_TIANPOWER_BMS_BLE_ID): cv.use_id(TianpowerBmsBle),
-        cv.Optional(CONF_SOFTWARE_VERSION): text_sensor.TEXT_SENSOR_SCHEMA.extend(
-            {
-                cv.GenerateID(): cv.declare_id(text_sensor.TextSensor),
-                cv.Optional(CONF_ICON, default=ICON_SOFTWARE_VERSION): cv.icon,
-            }
+        cv.Optional(CONF_SOFTWARE_VERSION): text_sensor.text_sensor_schema(
+            text_sensor.TextSensor, icon=ICON_SOFTWARE_VERSION
         ),
-        cv.Optional(CONF_DEVICE_MODEL): text_sensor.TEXT_SENSOR_SCHEMA.extend(
-            {
-                cv.GenerateID(): cv.declare_id(text_sensor.TextSensor),
-                cv.Optional(CONF_ICON, default=ICON_DEVICE_MODEL): cv.icon,
-            }
+        cv.Optional(CONF_DEVICE_MODEL): text_sensor.text_sensor_schema(
+            text_sensor.TextSensor, icon=ICON_DEVICE_MODEL
         ),
-        cv.Optional(CONF_VOLTAGE_PROTECTION): text_sensor.TEXT_SENSOR_SCHEMA.extend(
-            {
-                cv.GenerateID(): cv.declare_id(text_sensor.TextSensor),
-                cv.Optional(CONF_ICON, default=ICON_VOLTAGE_PROTECTION): cv.icon,
-            }
+        cv.Optional(CONF_VOLTAGE_PROTECTION): text_sensor.text_sensor_schema(
+            text_sensor.TextSensor, icon=ICON_VOLTAGE_PROTECTION
         ),
-        cv.Optional(CONF_CURRENT_PROTECTION): text_sensor.TEXT_SENSOR_SCHEMA.extend(
-            {
-                cv.GenerateID(): cv.declare_id(text_sensor.TextSensor),
-                cv.Optional(CONF_ICON, default=ICON_CURRENT_PROTECTION): cv.icon,
-            }
+        cv.Optional(CONF_CURRENT_PROTECTION): text_sensor.text_sensor_schema(
+            text_sensor.TextSensor, icon=ICON_CURRENT_PROTECTION
         ),
-        cv.Optional(CONF_TEMPERATURE_PROTECTION): text_sensor.TEXT_SENSOR_SCHEMA.extend(
-            {
-                cv.GenerateID(): cv.declare_id(text_sensor.TextSensor),
-                cv.Optional(CONF_ICON, default=ICON_TEMPERATURE_PROTECTION): cv.icon,
-            }
+        cv.Optional(CONF_TEMPERATURE_PROTECTION): text_sensor.text_sensor_schema(
+            text_sensor.TextSensor, icon=ICON_TEMPERATURE_PROTECTION
         ),
-        cv.Optional(CONF_ERRORS): text_sensor.TEXT_SENSOR_SCHEMA.extend(
-            {
-                cv.GenerateID(): cv.declare_id(text_sensor.TextSensor),
-                cv.Optional(CONF_ICON, default=ICON_ERRORS): cv.icon,
-            }
+        cv.Optional(CONF_ERRORS): text_sensor.text_sensor_schema(
+            text_sensor.TextSensor, icon=ICON_ERRORS
         ),
     }
 )
