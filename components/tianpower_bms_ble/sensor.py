@@ -352,6 +352,7 @@ CONFIG_SCHEMA = cv.Schema(
             accuracy_decimals=0,
             device_class=DEVICE_CLASS_EMPTY,
             state_class=STATE_CLASS_MEASUREMENT,
+        ),
         cv.Optional(CONF_ALARM_BITMASK): sensor.sensor_schema(
             unit_of_measurement=UNIT_EMPTY,
             icon=ICON_ALARM_BITMASK,
