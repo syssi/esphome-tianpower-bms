@@ -127,7 +127,7 @@ Byte Len Payload      Description                      Unit  Precision
  7    2  0x00 0x00    Unknown Bitmask
  9    2  0x00 0x00    High Alarm Bitmask
  11   2  0x00 0x00    Low Alarm Bitmask
- 13   2  0x00 0x00    Balancing? Bitmask
+ 13   2  0x00 0x00    Balancing Bitmask
  15   2  0x00 0x00    Unused
  17   2  0x00 0x00    Unused
  19   1  0xaa         End of frame
