@@ -63,6 +63,8 @@ binary_sensor:
       name: "${name} discharging"
     limiting_current:
       name: "${name} limiting current"
+    balancing:
+      name: "${name} balancing"
 
 sensor:
   - platform: tianpower_bms_ble
@@ -113,6 +115,10 @@ sensor:
       name: "${name} mosfet temperature"
     state_of_health:
       name: "${name} state of health"
+    balancing_bitmask:
+      name: "${name} balancing bitmask"
+    balancing_cell:
+      name: "${name} balancing cell"
     temperature_1:
       name: "${name} temperature 1"
     temperature_2:

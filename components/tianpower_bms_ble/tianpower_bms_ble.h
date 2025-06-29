@@ -33,6 +33,9 @@ class TianpowerBmsBle : public esphome::ble_client::BLEClientNode, public Pollin
   void set_limiting_current_binary_sensor(binary_sensor::BinarySensor *limiting_current_binary_sensor) {
     limiting_current_binary_sensor_ = limiting_current_binary_sensor;
   }
+  void set_balancing_binary_sensor(binary_sensor::BinarySensor *balancing_binary_sensor) {
+    balancing_binary_sensor_ = balancing_binary_sensor;
+  }
 
   void set_total_voltage_sensor(sensor::Sensor *total_voltage_sensor) { total_voltage_sensor_ = total_voltage_sensor; }
   void set_current_sensor(sensor::Sensor *current_sensor) { current_sensor_ = current_sensor; }
@@ -77,6 +80,12 @@ class TianpowerBmsBle : public esphome::ble_client::BLEClientNode, public Pollin
   }
   void set_state_of_health_sensor(sensor::Sensor *state_of_health_sensor) {
     state_of_health_sensor_ = state_of_health_sensor;
+  }
+  void set_balancing_bitmask_sensor(sensor::Sensor *balancing_bitmask_sensor) {
+    balancing_bitmask_sensor_ = balancing_bitmask_sensor;
+  }
+  void set_balancing_cell_sensor(sensor::Sensor *balancing_cell_sensor) {
+    balancing_cell_sensor_ = balancing_cell_sensor;
   }
 
   void set_min_cell_voltage_sensor(sensor::Sensor *min_cell_voltage_sensor) {
@@ -128,6 +137,7 @@ class TianpowerBmsBle : public esphome::ble_client::BLEClientNode, public Pollin
   binary_sensor::BinarySensor *charging_binary_sensor_;
   binary_sensor::BinarySensor *discharging_binary_sensor_;
   binary_sensor::BinarySensor *limiting_current_binary_sensor_;
+  binary_sensor::BinarySensor *balancing_binary_sensor_;
 
   sensor::Sensor *total_voltage_sensor_;
   sensor::Sensor *current_sensor_;
@@ -152,6 +162,8 @@ class TianpowerBmsBle : public esphome::ble_client::BLEClientNode, public Pollin
   sensor::Sensor *ambient_temperature_sensor_;
   sensor::Sensor *mosfet_temperature_sensor_;
   sensor::Sensor *state_of_health_sensor_;
+  sensor::Sensor *balancing_bitmask_sensor_;
+  sensor::Sensor *balancing_cell_sensor_;
 
   text_sensor::TextSensor *software_version_text_sensor_;
   text_sensor::TextSensor *device_model_text_sensor_;

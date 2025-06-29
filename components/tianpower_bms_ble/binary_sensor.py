@@ -12,11 +12,13 @@ CODEOWNERS = ["@syssi"]
 CONF_CHARGING = "charging"
 CONF_DISCHARGING = "discharging"
 CONF_LIMITING_CURRENT = "limiting_current"
+CONF_BALANCING = "balancing"
 
 BINARY_SENSORS = [
     CONF_CHARGING,
     CONF_DISCHARGING,
     CONF_LIMITING_CURRENT,
+    CONF_BALANCING,
 ]
 
 CONFIG_SCHEMA = cv.Schema(
@@ -30,6 +32,9 @@ CONFIG_SCHEMA = cv.Schema(
         ),
         cv.Optional(CONF_LIMITING_CURRENT): binary_sensor.binary_sensor_schema(
             icon="mdi:car-speed-limiter"
+        ),
+        cv.Optional(CONF_BALANCING): binary_sensor.binary_sensor_schema(
+            icon="mdi:scale-balance"
         ),
     }
 )
