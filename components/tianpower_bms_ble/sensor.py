@@ -49,6 +49,7 @@ CONF_AVERAGE_CELL_VOLTAGE = "average_cell_voltage"
 CONF_STATE_OF_HEALTH = "state_of_health"
 CONF_BALANCING_BITMASK = "balancing_bitmask"
 CONF_BALANCING_CELL = "balancing_cell"
+CONF_ALARM_BITMASK = "alarm_bitmask"
 
 CONF_CELL_VOLTAGE_1 = "cell_voltage_1"
 CONF_CELL_VOLTAGE_2 = "cell_voltage_2"
@@ -103,6 +104,7 @@ ICON_ERROR_BITMASK = "mdi:alert-circle-outline"
 ICON_STATE_OF_HEALTH = "mdi:heart-flash"
 ICON_BALANCING_BITMASK = "mdi:scale-balance"
 ICON_BALANCING_CELL = "mdi:battery-sync"
+ICON_ALARM_BITMASK = "mdi:alert-circle-outline"
 
 UNIT_AMPERE_HOURS = "Ah"
 
@@ -170,6 +172,7 @@ SENSORS = [
     CONF_STATE_OF_HEALTH,
     CONF_BALANCING_BITMASK,
     CONF_BALANCING_CELL,
+    CONF_ALARM_BITMASK,
 ]
 
 # pylint: disable=too-many-function-args
@@ -346,6 +349,12 @@ CONFIG_SCHEMA = cv.Schema(
         cv.Optional(CONF_BALANCING_CELL): sensor.sensor_schema(
             unit_of_measurement=UNIT_EMPTY,
             icon=ICON_BALANCING_CELL,
+            accuracy_decimals=0,
+            device_class=DEVICE_CLASS_EMPTY,
+            state_class=STATE_CLASS_MEASUREMENT,
+        cv.Optional(CONF_ALARM_BITMASK): sensor.sensor_schema(
+            unit_of_measurement=UNIT_EMPTY,
+            icon=ICON_ALARM_BITMASK,
             accuracy_decimals=0,
             device_class=DEVICE_CLASS_EMPTY,
             state_class=STATE_CLASS_MEASUREMENT,

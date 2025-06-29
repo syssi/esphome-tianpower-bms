@@ -87,7 +87,7 @@ class TianpowerBmsBle : public esphome::ble_client::BLEClientNode, public Pollin
   void set_balancing_cell_sensor(sensor::Sensor *balancing_cell_sensor) {
     balancing_cell_sensor_ = balancing_cell_sensor;
   }
-
+  void set_alarm_bitmask_sensor(sensor::Sensor *alarm_bitmask_sensor) { alarm_bitmask_sensor_ = alarm_bitmask_sensor; }
   void set_min_cell_voltage_sensor(sensor::Sensor *min_cell_voltage_sensor) {
     min_cell_voltage_sensor_ = min_cell_voltage_sensor;
   }
@@ -164,6 +164,7 @@ class TianpowerBmsBle : public esphome::ble_client::BLEClientNode, public Pollin
   sensor::Sensor *state_of_health_sensor_;
   sensor::Sensor *balancing_bitmask_sensor_;
   sensor::Sensor *balancing_cell_sensor_;
+  sensor::Sensor *alarm_bitmask_sensor_;
 
   text_sensor::TextSensor *software_version_text_sensor_;
   text_sensor::TextSensor *device_model_text_sensor_;

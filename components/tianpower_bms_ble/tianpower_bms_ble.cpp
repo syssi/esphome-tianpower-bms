@@ -414,6 +414,13 @@ void TianpowerBmsBle::decode_mosfet_status_data_(const std::vector<uint8_t> &dat
   //  7    2  0x00 0x00    Undervoltage protection bitmask
   //  9    2  0x00 0x00    High Alarm Bitmask
   //  11   2  0x00 0x00    Low Alarm Bitmask
+
+  // Combine high and low alarm bitmasks into one 32-bit alarm sensor
+  uint16_t high_alarm = tianpower_get_16bit(9);
+  uint16_t low_alarm = tianpower_get_16bit(11);
+  uint32_t combined_alarms = (uint32_t(high_alarm) << 16) | low_alarm;
+  this->publish_state_(this->alarm_bitmask_sensor_, (float) combined_alarms);
+
   //  13   2  0x00 0x00    Balancing Bitmask
   uint16_t balancing_bitmask = tianpower_get_16bit(13);
   this->publish_state_(this->balancing_bitmask_sensor_, (float) balancing_bitmask);

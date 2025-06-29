@@ -119,6 +119,8 @@ sensor:
       name: "${name} balancing bitmask"
     balancing_cell:
       name: "${name} balancing cell"
+    alarm_bitmask:
+      name: "${name} alarm bitmask"
     temperature_1:
       name: "${name} temperature 1"
     temperature_2:

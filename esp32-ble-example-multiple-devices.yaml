@@ -134,6 +134,8 @@ sensor:
       name: "${bms0} mosfet temperature"
     state_of_health:
       name: "${bms0} state of health"
+    alarm_bitmask:
+      name: "${bms0} alarm bitmask"
     temperature_1:
       name: "${bms0} temperature 1"
     temperature_2:
@@ -227,6 +229,8 @@ sensor:
       name: "${bms1} mosfet temperature"
     state_of_health:
       name: "${bms1} state of health"
+    alarm_bitmask:
+      name: "${bms1} alarm bitmask"
     temperature_1:
       name: "${bms1} temperature 1"
     temperature_2:
