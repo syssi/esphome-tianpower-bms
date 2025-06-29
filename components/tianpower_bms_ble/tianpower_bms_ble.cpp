@@ -414,7 +414,26 @@ void TianpowerBmsBle::decode_mosfet_status_data_(const std::vector<uint8_t> &dat
   //  7    2  0x00 0x00    Undervoltage protection bitmask
   //  9    2  0x00 0x00    High Alarm Bitmask
   //  11   2  0x00 0x00    Low Alarm Bitmask
-  //  13   2  0x00 0x00    Balancing? Bitmask
+  //  13   2  0x00 0x00    Balancing Bitmask
+  uint16_t balancing_bitmask = tianpower_get_16bit(13);
+  this->publish_state_(this->balancing_bitmask_sensor_, (float) balancing_bitmask);
+
+  // Check if any balancing is active
+  bool balancing_active = balancing_bitmask != 0;
+  this->publish_state_(this->balancing_binary_sensor_, balancing_active);
+
+  // Find which cell is currently balancing (lowest set bit = first active cell)
+  if (balancing_active) {
+    for (uint8_t i = 0; i < 24; i++) {
+      if (balancing_bitmask & (1 << i)) {
+        this->publish_state_(this->balancing_cell_sensor_, (float) (i + 1));
+        break;
+      }
+    }
+  } else {
+    this->publish_state_(this->balancing_cell_sensor_, NAN);
+  }
+
   //  15   2  0x00 0x00    Unused
   //  17   2  0x00 0x00    Unused
   //  19   1  0xaa         End of frame
@@ -504,6 +523,7 @@ void TianpowerBmsBle::dump_config() {  // NOLINT(google-readability-function-siz
   LOG_BINARY_SENSOR("", "Charging", this->charging_binary_sensor_);
   LOG_BINARY_SENSOR("", "Discharging", this->discharging_binary_sensor_);
   LOG_BINARY_SENSOR("", "Limiting current", this->limiting_current_binary_sensor_);
+  LOG_BINARY_SENSOR("", "Balancing", this->balancing_binary_sensor_);
 
   LOG_SENSOR("", "Total voltage", this->total_voltage_sensor_);
   LOG_SENSOR("", "Current", this->current_sensor_);
@@ -527,6 +547,8 @@ void TianpowerBmsBle::dump_config() {  // NOLINT(google-readability-function-siz
   LOG_SENSOR("", "Ambient temperature", this->ambient_temperature_sensor_);
   LOG_SENSOR("", "Mosfet temperature", this->mosfet_temperature_sensor_);
   LOG_SENSOR("", "State of health", this->state_of_charge_sensor_);
+  LOG_SENSOR("", "Balancing bitmask", this->balancing_bitmask_sensor_);
+  LOG_SENSOR("", "Balancing cell", this->balancing_cell_sensor_);
   LOG_SENSOR("", "Temperature 1", this->temperatures_[0].temperature_sensor_);
   LOG_SENSOR("", "Temperature 2", this->temperatures_[1].temperature_sensor_);
   LOG_SENSOR("", "Temperature 3", this->temperatures_[2].temperature_sensor_);

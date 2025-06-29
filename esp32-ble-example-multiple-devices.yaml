@@ -71,6 +71,8 @@ binary_sensor:
       name: "${bms0} discharging"
     limiting_current:
       name: "${bms0} limiting current"
+    balancing:
+      name: "${bms0} balancing"
 
   - platform: tianpower_bms_ble
     tianpower_bms_ble_id: bms1
@@ -80,6 +82,8 @@ binary_sensor:
       name: "${bms1} discharging"
     limiting_current:
       name: "${bms1} limiting current"
+    balancing:
+      name: "${bms1} balancing"
 
 sensor:
   - platform: tianpower_bms_ble
@@ -170,6 +174,10 @@ sensor:
       name: "${bms0} cell voltage 15"
     cell_voltage_16:
       name: "${bms0} cell voltage 16"
+    balancing_bitmask:
+      name: "${bms0} balancing bitmask"
+    balancing_cell:
+      name: "${bms0} balancing cell"
 
   - platform: tianpower_bms_ble
     tianpower_bms_ble_id: bms1
@@ -259,6 +267,10 @@ sensor:
       name: "${bms1} cell voltage 15"
     cell_voltage_16:
       name: "${bms1} cell voltage 16"
+    balancing_bitmask:
+      name: "${bms1} balancing bitmask"
+    balancing_cell:
+      name: "${bms1} balancing cell"
 
 text_sensor:
   - platform: tianpower_bms_ble
