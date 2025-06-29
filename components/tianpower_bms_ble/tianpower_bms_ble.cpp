@@ -548,7 +548,7 @@ void TianpowerBmsBle::dump_config() {  // NOLINT(google-readability-function-siz
   LOG_SENSOR("", "Mosfet temperature", this->mosfet_temperature_sensor_);
   LOG_SENSOR("", "State of health", this->state_of_charge_sensor_);
   LOG_SENSOR("", "Balancing bitmask", this->balancing_bitmask_sensor_);
-  LOG_SENSOR("", "Balancing current cell", this->balancing_current_cell_sensor_);
+  LOG_SENSOR("", "Balancing cell", this->balancing_cell_sensor_);
   LOG_SENSOR("", "Temperature 1", this->temperatures_[0].temperature_sensor_);
   LOG_SENSOR("", "Temperature 2", this->temperatures_[1].temperature_sensor_);
   LOG_SENSOR("", "Temperature 3", this->temperatures_[2].temperature_sensor_);
