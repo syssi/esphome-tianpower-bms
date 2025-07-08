@@ -20,7 +20,7 @@ from esphome.const import (
     UNIT_WATT,
 )
 
-from . import CONF_TIANPOWER_BMS_BLE_ID, TianpowerBmsBle
+from . import CONF_TIANPOWER_BMS_BLE_ID, TIANPOWER_BMS_BLE_COMPONENT_SCHEMA
 
 DEPENDENCIES = ["tianpower_bms_ble"]
 
@@ -176,9 +176,8 @@ SENSORS = [
 ]
 
 # pylint: disable=too-many-function-args
-CONFIG_SCHEMA = cv.Schema(
+CONFIG_SCHEMA = TIANPOWER_BMS_BLE_COMPONENT_SCHEMA.extend(
     {
-        cv.GenerateID(CONF_TIANPOWER_BMS_BLE_ID): cv.use_id(TianpowerBmsBle),
         cv.Optional(CONF_TOTAL_VOLTAGE): sensor.sensor_schema(
             unit_of_measurement=UNIT_VOLT,
             icon=ICON_EMPTY,
