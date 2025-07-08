@@ -33,7 +33,7 @@ Credits: Thanks to [@xpinguinx](https://github.com/xpinguinx) for heavily testin
 * Tianpower TP-LT55AT (BN-HES16S48V200LT55A-V1.1.2) used in BASENGREEN BR-OW-LV 14.33kWh 51.2V 280Ah battery bank ([#22](https://github.com/syssi/esphome-tianpower-bms/discussions/22))<br>
   Probably advertised via BLE as `TP_BSTBD-24C-xxxx`
 
-* Tianpower TP-LT55A in BASENGREEN 48V DIY KITS V2 battery bank ([#31](https://github.com/syssi/esphome-tianpower-bms/issues/31))<br>
+* Tianpower TP-LT55A (HY-CW007-B200LT55-V1.0.0T) used in BASENGREEN 48V DIY KITS V2 battery bank ([#31](https://github.com/syssi/esphome-tianpower-bms/issues/31) and [#61](https://github.com/syssi/esphome-tianpower-bms/issues/61))<br>
   Probably advertised via BLE as `TP_123456`
 
 ## Requirements
