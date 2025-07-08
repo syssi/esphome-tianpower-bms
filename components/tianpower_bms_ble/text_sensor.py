@@ -3,7 +3,7 @@ from esphome.components import text_sensor
 import esphome.config_validation as cv
 from esphome.const import CONF_ID
 
-from . import CONF_TIANPOWER_BMS_BLE_ID, TianpowerBmsBle
+from . import CONF_TIANPOWER_BMS_BLE_ID, TIANPOWER_BMS_BLE_COMPONENT_SCHEMA
 
 DEPENDENCIES = ["tianpower_bms_ble"]
 
@@ -32,9 +32,8 @@ TEXT_SENSORS = [
     CONF_ERRORS,
 ]
 
-CONFIG_SCHEMA = cv.Schema(
+CONFIG_SCHEMA = TIANPOWER_BMS_BLE_COMPONENT_SCHEMA.extend(
     {
-        cv.GenerateID(CONF_TIANPOWER_BMS_BLE_ID): cv.use_id(TianpowerBmsBle),
         cv.Optional(CONF_SOFTWARE_VERSION): text_sensor.text_sensor_schema(
             text_sensor.TextSensor, icon=ICON_SOFTWARE_VERSION
         ),

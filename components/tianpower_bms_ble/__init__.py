@@ -15,6 +15,12 @@ TianpowerBmsBle = tianpower_bms_ble_ns.class_(
     "TianpowerBmsBle", ble_client.BLEClientNode, cg.PollingComponent
 )
 
+TIANPOWER_BMS_BLE_COMPONENT_SCHEMA = cv.Schema(
+    {
+        cv.GenerateID(CONF_TIANPOWER_BMS_BLE_ID): cv.use_id(TianpowerBmsBle),
+    }
+)
+
 CONFIG_SCHEMA = (
     cv.Schema(
         {
