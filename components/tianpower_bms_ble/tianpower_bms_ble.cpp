@@ -550,10 +550,12 @@ void TianpowerBmsBle::dump_config() {  // NOLINT(google-readability-function-siz
   LOG_SENSOR("", "Min voltage cell", this->min_voltage_cell_sensor_);
   LOG_SENSOR("", "Max voltage cell", this->max_voltage_cell_sensor_);
   LOG_SENSOR("", "Delta cell voltage", this->delta_cell_voltage_sensor_);
+  LOG_SENSOR("", "Average cell voltage", this->average_cell_voltage_sensor_);
+  LOG_SENSOR("", "Alarm bitmask", this->alarm_bitmask_sensor_);
   LOG_SENSOR("", "Average temperature", this->average_temperature_sensor_);
   LOG_SENSOR("", "Ambient temperature", this->ambient_temperature_sensor_);
   LOG_SENSOR("", "Mosfet temperature", this->mosfet_temperature_sensor_);
-  LOG_SENSOR("", "State of health", this->state_of_charge_sensor_);
+  LOG_SENSOR("", "State of health", this->state_of_health_sensor_);
   LOG_SENSOR("", "Balancing bitmask", this->balancing_bitmask_sensor_);
   LOG_SENSOR("", "Balancing cell", this->balancing_cell_sensor_);
   LOG_SENSOR("", "Temperature 1", this->temperatures_[0].temperature_sensor_);
