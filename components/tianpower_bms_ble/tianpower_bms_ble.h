@@ -84,9 +84,6 @@ class TianpowerBmsBle : public esphome::ble_client::BLEClientNode, public Pollin
   void set_balancing_bitmask_sensor(sensor::Sensor *balancing_bitmask_sensor) {
     balancing_bitmask_sensor_ = balancing_bitmask_sensor;
   }
-  void set_balancing_cell_sensor(sensor::Sensor *balancing_cell_sensor) {
-    balancing_cell_sensor_ = balancing_cell_sensor;
-  }
   void set_alarm_bitmask_sensor(sensor::Sensor *alarm_bitmask_sensor) { alarm_bitmask_sensor_ = alarm_bitmask_sensor; }
   void set_min_cell_voltage_sensor(sensor::Sensor *min_cell_voltage_sensor) {
     min_cell_voltage_sensor_ = min_cell_voltage_sensor;
@@ -108,6 +105,9 @@ class TianpowerBmsBle : public esphome::ble_client::BLEClientNode, public Pollin
   }
   void set_cell_voltage_sensor(uint8_t cell, sensor::Sensor *cell_voltage_sensor) {
     this->cells_[cell].cell_voltage_sensor_ = cell_voltage_sensor;
+  }
+  void set_cell_balancing_binary_sensor(uint8_t cell, binary_sensor::BinarySensor *cell_balancing_binary_sensor) {
+    this->cells_[cell].balancing_binary_sensor_ = cell_balancing_binary_sensor;
   }
   void set_temperature_sensor(uint8_t temperature, sensor::Sensor *temperature_sensor) {
     this->temperatures_[temperature].temperature_sensor_ = temperature_sensor;
@@ -163,7 +163,6 @@ class TianpowerBmsBle : public esphome::ble_client::BLEClientNode, public Pollin
   sensor::Sensor *mosfet_temperature_sensor_;
   sensor::Sensor *state_of_health_sensor_;
   sensor::Sensor *balancing_bitmask_sensor_;
-  sensor::Sensor *balancing_cell_sensor_;
   sensor::Sensor *alarm_bitmask_sensor_;
 
   text_sensor::TextSensor *software_version_text_sensor_;
@@ -175,6 +174,7 @@ class TianpowerBmsBle : public esphome::ble_client::BLEClientNode, public Pollin
 
   struct Cell {
     sensor::Sensor *cell_voltage_sensor_{nullptr};
+    binary_sensor::BinarySensor *balancing_binary_sensor_{nullptr};
   } cells_[24];
 
   struct Temperature {
