@@ -65,6 +65,38 @@ binary_sensor:
       name: "${name} limiting current"
     balancing:
       name: "${name} balancing"
+    cell_balancing_1:
+      name: "${name} cell 1 balancing"
+    cell_balancing_2:
+      name: "${name} cell 2 balancing"
+    cell_balancing_3:
+      name: "${name} cell 3 balancing"
+    cell_balancing_4:
+      name: "${name} cell 4 balancing"
+    cell_balancing_5:
+      name: "${name} cell 5 balancing"
+    cell_balancing_6:
+      name: "${name} cell 6 balancing"
+    cell_balancing_7:
+      name: "${name} cell 7 balancing"
+    cell_balancing_8:
+      name: "${name} cell 8 balancing"
+    cell_balancing_9:
+      name: "${name} cell 9 balancing"
+    cell_balancing_10:
+      name: "${name} cell 10 balancing"
+    cell_balancing_11:
+      name: "${name} cell 11 balancing"
+    cell_balancing_12:
+      name: "${name} cell 12 balancing"
+    cell_balancing_13:
+      name: "${name} cell 13 balancing"
+    cell_balancing_14:
+      name: "${name} cell 14 balancing"
+    cell_balancing_15:
+      name: "${name} cell 15 balancing"
+    cell_balancing_16:
+      name: "${name} cell 16 balancing"
 
 sensor:
   - platform: tianpower_bms_ble
@@ -117,8 +149,6 @@ sensor:
       name: "${name} state of health"
     balancing_bitmask:
       name: "${name} balancing bitmask"
-    balancing_cell:
-      name: "${name} balancing cell"
     alarm_bitmask:
       name: "${name} alarm bitmask"
     temperature_1:

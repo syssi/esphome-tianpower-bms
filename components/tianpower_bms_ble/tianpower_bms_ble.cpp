@@ -424,21 +424,11 @@ void TianpowerBmsBle::decode_mosfet_status_data_(const std::vector<uint8_t> &dat
   //  13   2  0x00 0x00    Balancing Bitmask
   uint16_t balancing_bitmask = tianpower_get_16bit(13);
   this->publish_state_(this->balancing_bitmask_sensor_, (float) balancing_bitmask);
+  this->publish_state_(this->balancing_binary_sensor_, balancing_bitmask != 0);
 
-  // Check if any balancing is active
-  bool balancing_active = balancing_bitmask != 0;
-  this->publish_state_(this->balancing_binary_sensor_, balancing_active);
-
-  // Find which cell is currently balancing (lowest set bit = first active cell)
-  if (balancing_active) {
-    for (uint8_t i = 0; i < 24; i++) {
-      if (balancing_bitmask & (1 << i)) {
-        this->publish_state_(this->balancing_cell_sensor_, (float) (i + 1));
-        break;
-      }
-    }
-  } else {
-    this->publish_state_(this->balancing_cell_sensor_, NAN);
+  for (uint8_t i = 0; i < 16; i++) {
+    bool is_balancing = (balancing_bitmask & (1 << i)) != 0;
+    this->publish_state_(this->cells_[i].balancing_binary_sensor_, is_balancing);
   }
 
   //  15   2  0x00 0x00    Unused
@@ -531,6 +521,30 @@ void TianpowerBmsBle::dump_config() {  // NOLINT(google-readability-function-siz
   LOG_BINARY_SENSOR("", "Discharging", this->discharging_binary_sensor_);
   LOG_BINARY_SENSOR("", "Limiting current", this->limiting_current_binary_sensor_);
   LOG_BINARY_SENSOR("", "Balancing", this->balancing_binary_sensor_);
+  LOG_BINARY_SENSOR("", "Cell 1 Balancing", this->cells_[0].balancing_binary_sensor_);
+  LOG_BINARY_SENSOR("", "Cell 2 Balancing", this->cells_[1].balancing_binary_sensor_);
+  LOG_BINARY_SENSOR("", "Cell 3 Balancing", this->cells_[2].balancing_binary_sensor_);
+  LOG_BINARY_SENSOR("", "Cell 4 Balancing", this->cells_[3].balancing_binary_sensor_);
+  LOG_BINARY_SENSOR("", "Cell 5 Balancing", this->cells_[4].balancing_binary_sensor_);
+  LOG_BINARY_SENSOR("", "Cell 6 Balancing", this->cells_[5].balancing_binary_sensor_);
+  LOG_BINARY_SENSOR("", "Cell 7 Balancing", this->cells_[6].balancing_binary_sensor_);
+  LOG_BINARY_SENSOR("", "Cell 8 Balancing", this->cells_[7].balancing_binary_sensor_);
+  LOG_BINARY_SENSOR("", "Cell 9 Balancing", this->cells_[8].balancing_binary_sensor_);
+  LOG_BINARY_SENSOR("", "Cell 10 Balancing", this->cells_[9].balancing_binary_sensor_);
+  LOG_BINARY_SENSOR("", "Cell 11 Balancing", this->cells_[10].balancing_binary_sensor_);
+  LOG_BINARY_SENSOR("", "Cell 12 Balancing", this->cells_[11].balancing_binary_sensor_);
+  LOG_BINARY_SENSOR("", "Cell 13 Balancing", this->cells_[12].balancing_binary_sensor_);
+  LOG_BINARY_SENSOR("", "Cell 14 Balancing", this->cells_[13].balancing_binary_sensor_);
+  LOG_BINARY_SENSOR("", "Cell 15 Balancing", this->cells_[14].balancing_binary_sensor_);
+  LOG_BINARY_SENSOR("", "Cell 16 Balancing", this->cells_[15].balancing_binary_sensor_);
+  LOG_BINARY_SENSOR("", "Cell 17 Balancing", this->cells_[16].balancing_binary_sensor_);
+  LOG_BINARY_SENSOR("", "Cell 18 Balancing", this->cells_[17].balancing_binary_sensor_);
+  LOG_BINARY_SENSOR("", "Cell 19 Balancing", this->cells_[18].balancing_binary_sensor_);
+  LOG_BINARY_SENSOR("", "Cell 20 Balancing", this->cells_[19].balancing_binary_sensor_);
+  LOG_BINARY_SENSOR("", "Cell 21 Balancing", this->cells_[20].balancing_binary_sensor_);
+  LOG_BINARY_SENSOR("", "Cell 22 Balancing", this->cells_[21].balancing_binary_sensor_);
+  LOG_BINARY_SENSOR("", "Cell 23 Balancing", this->cells_[22].balancing_binary_sensor_);
+  LOG_BINARY_SENSOR("", "Cell 24 Balancing", this->cells_[23].balancing_binary_sensor_);
 
   LOG_SENSOR("", "Total voltage", this->total_voltage_sensor_);
   LOG_SENSOR("", "Current", this->current_sensor_);
@@ -557,7 +571,6 @@ void TianpowerBmsBle::dump_config() {  // NOLINT(google-readability-function-siz
   LOG_SENSOR("", "Mosfet temperature", this->mosfet_temperature_sensor_);
   LOG_SENSOR("", "State of health", this->state_of_health_sensor_);
   LOG_SENSOR("", "Balancing bitmask", this->balancing_bitmask_sensor_);
-  LOG_SENSOR("", "Balancing cell", this->balancing_cell_sensor_);
   LOG_SENSOR("", "Temperature 1", this->temperatures_[0].temperature_sensor_);
   LOG_SENSOR("", "Temperature 2", this->temperatures_[1].temperature_sensor_);
   LOG_SENSOR("", "Temperature 3", this->temperatures_[2].temperature_sensor_);

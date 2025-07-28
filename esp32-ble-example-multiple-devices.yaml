@@ -73,6 +73,38 @@ binary_sensor:
       name: "${bms0} limiting current"
     balancing:
       name: "${bms0} balancing"
+    cell_balancing_1:
+      name: "${bms0} cell 1 balancing"
+    cell_balancing_2:
+      name: "${bms0} cell 2 balancing"
+    cell_balancing_3:
+      name: "${bms0} cell 3 balancing"
+    cell_balancing_4:
+      name: "${bms0} cell 4 balancing"
+    cell_balancing_5:
+      name: "${bms0} cell 5 balancing"
+    cell_balancing_6:
+      name: "${bms0} cell 6 balancing"
+    cell_balancing_7:
+      name: "${bms0} cell 7 balancing"
+    cell_balancing_8:
+      name: "${bms0} cell 8 balancing"
+    cell_balancing_9:
+      name: "${bms0} cell 9 balancing"
+    cell_balancing_10:
+      name: "${bms0} cell 10 balancing"
+    cell_balancing_11:
+      name: "${bms0} cell 11 balancing"
+    cell_balancing_12:
+      name: "${bms0} cell 12 balancing"
+    cell_balancing_13:
+      name: "${bms0} cell 13 balancing"
+    cell_balancing_14:
+      name: "${bms0} cell 14 balancing"
+    cell_balancing_15:
+      name: "${bms0} cell 15 balancing"
+    cell_balancing_16:
+      name: "${bms0} cell 16 balancing"
 
   - platform: tianpower_bms_ble
     tianpower_bms_ble_id: bms1
@@ -84,6 +116,38 @@ binary_sensor:
       name: "${bms1} limiting current"
     balancing:
       name: "${bms1} balancing"
+    cell_balancing_1:
+      name: "${bms1} cell 1 balancing"
+    cell_balancing_2:
+      name: "${bms1} cell 2 balancing"
+    cell_balancing_3:
+      name: "${bms1} cell 3 balancing"
+    cell_balancing_4:
+      name: "${bms1} cell 4 balancing"
+    cell_balancing_5:
+      name: "${bms1} cell 5 balancing"
+    cell_balancing_6:
+      name: "${bms1} cell 6 balancing"
+    cell_balancing_7:
+      name: "${bms1} cell 7 balancing"
+    cell_balancing_8:
+      name: "${bms1} cell 8 balancing"
+    cell_balancing_9:
+      name: "${bms1} cell 9 balancing"
+    cell_balancing_10:
+      name: "${bms1} cell 10 balancing"
+    cell_balancing_11:
+      name: "${bms1} cell 11 balancing"
+    cell_balancing_12:
+      name: "${bms1} cell 12 balancing"
+    cell_balancing_13:
+      name: "${bms1} cell 13 balancing"
+    cell_balancing_14:
+      name: "${bms1} cell 14 balancing"
+    cell_balancing_15:
+      name: "${bms1} cell 15 balancing"
+    cell_balancing_16:
+      name: "${bms1} cell 16 balancing"
 
 sensor:
   - platform: tianpower_bms_ble
@@ -178,8 +242,6 @@ sensor:
       name: "${bms0} cell voltage 16"
     balancing_bitmask:
       name: "${bms0} balancing bitmask"
-    balancing_cell:
-      name: "${bms0} balancing cell"
 
   - platform: tianpower_bms_ble
     tianpower_bms_ble_id: bms1
@@ -273,8 +335,6 @@ sensor:
       name: "${bms1} cell voltage 16"
     balancing_bitmask:
       name: "${bms1} balancing bitmask"
-    balancing_cell:
-      name: "${bms1} balancing cell"
 
 text_sensor:
   - platform: tianpower_bms_ble
