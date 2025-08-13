@@ -342,7 +342,7 @@ sensor:
       name: "${bms1} balancing bitmask"
 
 switch:
-  - platform: ble_client0
+  - platform: ble_client
     ble_client_id: client0
     name: "${bms0} enable bluetooth connection"
     id: ble_client_switch0
