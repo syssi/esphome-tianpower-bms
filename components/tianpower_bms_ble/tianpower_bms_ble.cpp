@@ -477,7 +477,7 @@ void TianpowerBmsBle::decode_cell_voltages_data_(const uint8_t &chunk, const std
 
   // Reset on new cycle (chunk 0) or timeout
   if (chunk == 0 || (current_time - this->last_cell_voltages_chunk_timestamp_) > 5000) {
-    this->chunks_received_ = 0;
+    this->cell_voltages_chunks_received_ = 0;
     this->min_cell_voltage_ = 100.0f;
     this->max_cell_voltage_ = -100.0f;
     this->last_cell_voltages_chunk_timestamp_ = current_time;
