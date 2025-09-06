@@ -470,9 +470,20 @@ void TianpowerBmsBle::decode_cell_voltages_data_(const uint8_t &chunk, const std
   };
 
   uint8_t offset = 8 * chunk;
+  uint32_t current_time = millis();
 
   ESP_LOGI(TAG, "Cell voltages frame (chunk %d) received", chunk);
   ESP_LOGD(TAG, "  %s", format_hex_pretty(&data.front(), data.size()).c_str());
+
+  // Reset on new cycle (chunk 0) or timeout
+  if (chunk == 0 || (current_time - this->last_cell_voltages_chunk_timestamp_) > 5000) {
+    this->cell_voltages_chunks_received_ = 0;
+    this->min_cell_voltage_ = 100.0f;
+    this->max_cell_voltage_ = -100.0f;
+    this->last_cell_voltages_chunk_timestamp_ = current_time;
+  }
+
+  this->cell_voltages_chunks_received_ |= (1 << chunk);
 
   // Byte Len Payload      Description                      Unit  Precision
   //  0    1  0x55         Start of frame
@@ -499,16 +510,14 @@ void TianpowerBmsBle::decode_cell_voltages_data_(const uint8_t &chunk, const std
     this->publish_state_(this->cells_[i + offset].cell_voltage_sensor_, cell_voltage);
   }
 
-  // Publish aggregated sensors at the last chunk. Must be improved if 3 chunks are retrieved.
-  if (chunk == 1) {
+  if (this->cell_voltages_chunks_received_ == 0b11) {
     this->publish_state_(this->min_cell_voltage_sensor_, this->min_cell_voltage_);
     this->publish_state_(this->max_cell_voltage_sensor_, this->max_cell_voltage_);
     this->publish_state_(this->max_voltage_cell_sensor_, (float) this->max_voltage_cell_);
     this->publish_state_(this->min_voltage_cell_sensor_, (float) this->min_voltage_cell_);
     this->publish_state_(this->delta_cell_voltage_sensor_, this->max_cell_voltage_ - this->min_cell_voltage_);
 
-    this->min_cell_voltage_ = 100.0f;
-    this->max_cell_voltage_ = -100.0f;
+    this->cell_voltages_chunks_received_ = 0;
   }
 
   //  19   1  0xaa         End of frame

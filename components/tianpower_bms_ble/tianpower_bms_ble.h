@@ -191,6 +191,9 @@ class TianpowerBmsBle : public esphome::ble_client::BLEClientNode, public Pollin
   uint8_t max_voltage_cell_{0};
   uint8_t min_voltage_cell_{0};
 
+  uint8_t cell_voltages_chunks_received_{0};
+  uint32_t last_cell_voltages_chunk_timestamp_{0};
+
   void decode_software_version_data_(const std::vector<uint8_t> &data);
   void decode_hardware_version_data_(const std::vector<uint8_t> &data);
   void decode_status_data_(const std::vector<uint8_t> &data);
