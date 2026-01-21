@@ -207,7 +207,7 @@ void TianpowerBmsBle::gattc_event_handler(esp_gattc_cb_event_t event, esp_gatt_i
     }
     case ESP_GATTC_NOTIFY_EVT: {
       ESP_LOGV(TAG, "Notification received (handle 0x%02X): %s", param->notify.handle,
-               format_hex_pretty(param->notify.value, param->notify.value_len).c_str());
+               format_hex_pretty(param->notify.value, param->notify.value_len).c_str());  // NOLINT
 
       std::vector<uint8_t> data(param->notify.value, param->notify.value + param->notify.value_len);
 
@@ -232,7 +232,7 @@ void TianpowerBmsBle::update() {
 
 void TianpowerBmsBle::on_tianpower_bms_ble_data(const uint8_t &handle, const std::vector<uint8_t> &data) {
   if (data[0] != TIANPOWER_PKT_START || data.back() != TIANPOWER_PKT_END || data.size() != MAX_RESPONSE_SIZE) {
-    ESP_LOGW(TAG, "Invalid response received: %s", format_hex_pretty(&data.front(), data.size()).c_str());
+    ESP_LOGW(TAG, "Invalid response received: %s", format_hex_pretty(&data.front(), data.size()).c_str());  // NOLINT
     return;
   }
 
@@ -272,13 +272,13 @@ void TianpowerBmsBle::on_tianpower_bms_ble_data(const uint8_t &handle, const std
       break;
     default:
       ESP_LOGW(TAG, "Unhandled response received (frame_type 0x%02X): %s", frame_type,
-               format_hex_pretty(&data.front(), data.size()).c_str());
+               format_hex_pretty(&data.front(), data.size()).c_str());  // NOLINT
   }
 }
 
 void TianpowerBmsBle::decode_software_version_data_(const std::vector<uint8_t> &data) {
   ESP_LOGI(TAG, "Software version frame received");
-  ESP_LOGD(TAG, "  %s", format_hex_pretty(&data.front(), data.size()).c_str());
+  ESP_LOGD(TAG, "  %s", format_hex_pretty(&data.front(), data.size()).c_str());  // NOLINT
 
   // Byte Len Payload      Description                      Unit  Precision
   //  0    1  0x55         Start of frame
@@ -293,7 +293,7 @@ void TianpowerBmsBle::decode_software_version_data_(const std::vector<uint8_t> &
 
 void TianpowerBmsBle::decode_hardware_version_data_(const std::vector<uint8_t> &data) {
   ESP_LOGI(TAG, "Hardware version frame received");
-  ESP_LOGD(TAG, "  %s", format_hex_pretty(&data.front(), data.size()).c_str());
+  ESP_LOGD(TAG, "  %s", format_hex_pretty(&data.front(), data.size()).c_str());  // NOLINT
 
   // Byte Len Payload      Description                      Unit  Precision
   //  0    1  0x55         Start of frame
@@ -312,7 +312,7 @@ void TianpowerBmsBle::decode_status_data_(const std::vector<uint8_t> &data) {
   };
 
   ESP_LOGI(TAG, "Status frame received");
-  ESP_LOGD(TAG, "  %s", format_hex_pretty(&data.front(), data.size()).c_str());
+  ESP_LOGD(TAG, "  %s", format_hex_pretty(&data.front(), data.size()).c_str());  // NOLINT
 
   // Byte Len Payload      Description                      Unit  Precision
   //  0    1  0x55         Start of frame
@@ -356,7 +356,7 @@ void TianpowerBmsBle::decode_general_info_data_(const std::vector<uint8_t> &data
   };
 
   ESP_LOGI(TAG, "General info frame received");
-  ESP_LOGD(TAG, "  %s", format_hex_pretty(&data.front(), data.size()).c_str());
+  ESP_LOGD(TAG, "  %s", format_hex_pretty(&data.front(), data.size()).c_str());  // NOLINT
 
   // Byte Len Payload      Description                      Unit  Precision
   //  0    1  0x55         Start of frame
@@ -405,7 +405,7 @@ void TianpowerBmsBle::decode_mosfet_status_data_(const std::vector<uint8_t> &dat
   };
 
   ESP_LOGI(TAG, "Mosfet status frame received");
-  ESP_LOGD(TAG, "  %s", format_hex_pretty(&data.front(), data.size()).c_str());
+  ESP_LOGD(TAG, "  %s", format_hex_pretty(&data.front(), data.size()).c_str());  // NOLINT
 
   // Byte Len Payload      Description                      Unit  Precision
   //  0    1  0x55         Start of frame
@@ -449,7 +449,7 @@ void TianpowerBmsBle::decode_temperature_data_(const std::vector<uint8_t> &data)
   };
 
   ESP_LOGI(TAG, "Temperature frame received");
-  ESP_LOGD(TAG, "  %s", format_hex_pretty(&data.front(), data.size()).c_str());
+  ESP_LOGD(TAG, "  %s", format_hex_pretty(&data.front(), data.size()).c_str());  // NOLINT
 
   // Byte Len Payload      Description                      Unit  Precision
   //  0    1  0x55         Start of frame
@@ -480,7 +480,7 @@ void TianpowerBmsBle::decode_cell_voltages_data_(const uint8_t &chunk, const std
   uint32_t current_time = millis();
 
   ESP_LOGI(TAG, "Cell voltages frame (chunk %d) received", chunk);
-  ESP_LOGD(TAG, "  %s", format_hex_pretty(&data.front(), data.size()).c_str());
+  ESP_LOGD(TAG, "  %s", format_hex_pretty(&data.front(), data.size()).c_str());  // NOLINT
 
   // Reset on new cycle (chunk 0) or timeout
   if (chunk == 0 || (current_time - this->last_cell_voltages_chunk_timestamp_) > 5000) {
@@ -663,7 +663,7 @@ bool TianpowerBmsBle::send_command_(uint8_t function) {
   frame[3] = TIANPOWER_PKT_END;
 
   ESP_LOGD(TAG, "Send command (handle 0x%02X): %s", this->char_command_handle_,
-           format_hex_pretty(frame, sizeof(frame)).c_str());
+           format_hex_pretty(frame, sizeof(frame)).c_str());  // NOLINT
 
   auto status =
       esp_ble_gattc_write_char(this->parent_->get_gattc_if(), this->parent_->get_conn_id(), this->char_command_handle_,
