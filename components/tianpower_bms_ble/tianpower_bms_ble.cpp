@@ -650,9 +650,7 @@ void TianpowerBmsBle::reset_online_status_tracker_() {
   this->publish_state_(this->online_status_binary_sensor_, true);
 }
 
-void TianpowerBmsBle::publish_device_unavailable_() {
-  this->publish_state_(this->online_status_binary_sensor_, false);
-}
+void TianpowerBmsBle::publish_device_unavailable_() { this->publish_state_(this->online_status_binary_sensor_, false); }
 
 void TianpowerBmsBle::publish_state_(binary_sensor::BinarySensor *binary_sensor, const bool &state) {
   if (binary_sensor == nullptr)
