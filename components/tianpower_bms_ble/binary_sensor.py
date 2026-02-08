@@ -1,7 +1,7 @@
 import esphome.codegen as cg
 from esphome.components import binary_sensor
 import esphome.config_validation as cv
-from esphome.const import CONF_ID
+from esphome.const import CONF_ID, DEVICE_CLASS_CONNECTIVITY, ENTITY_CATEGORY_DIAGNOSTIC
 
 from . import CONF_TIANPOWER_BMS_BLE_ID, TIANPOWER_BMS_BLE_COMPONENT_SCHEMA
 
@@ -9,6 +9,7 @@ DEPENDENCIES = ["tianpower_bms_ble"]
 
 CODEOWNERS = ["@syssi"]
 
+CONF_ONLINE_STATUS = "online_status"
 CONF_CHARGING = "charging"
 CONF_DISCHARGING = "discharging"
 CONF_LIMITING_CURRENT = "limiting_current"
@@ -40,6 +41,7 @@ CONF_CELL_BALANCING_23 = "cell_balancing_23"
 CONF_CELL_BALANCING_24 = "cell_balancing_24"
 
 BINARY_SENSORS = [
+    CONF_ONLINE_STATUS,
     CONF_CHARGING,
     CONF_DISCHARGING,
     CONF_LIMITING_CURRENT,
@@ -75,6 +77,10 @@ CELL_BALANCING_SENSORS = [
 
 CONFIG_SCHEMA = TIANPOWER_BMS_BLE_COMPONENT_SCHEMA.extend(
     {
+        cv.Optional(CONF_ONLINE_STATUS): binary_sensor.binary_sensor_schema(
+            device_class=DEVICE_CLASS_CONNECTIVITY,
+            entity_category=ENTITY_CATEGORY_DIAGNOSTIC,
+        ),
         cv.Optional(CONF_CHARGING): binary_sensor.binary_sensor_schema(
             icon="mdi:battery-charging"
         ),

@@ -20,6 +20,7 @@ static const uint16_t TIANPOWER_BMS_NOTIFY2_CHARACTERISTIC_UUID = 0xFF03;  // ha
 static const uint16_t TIANPOWER_BMS_CONTROL_CHARACTERISTIC_UUID = 0xFF02;  // handle 0x15
 
 static const uint16_t MAX_RESPONSE_SIZE = 20;
+static const uint8_t MAX_NO_RESPONSE_COUNT = 10;
 
 static const uint8_t TIANPOWER_PKT_START = 0x55;
 static const uint8_t TIANPOWER_FUNCTION_REQUEST = 0x04;
@@ -225,6 +226,8 @@ void TianpowerBmsBle::update() {
     return;
   }
 
+  this->track_online_status_();
+
   for (uint8_t command : TIANPOWER_COMMAND_QUEUE) {
     this->send_command_(command);
   }
@@ -235,6 +238,8 @@ void TianpowerBmsBle::on_tianpower_bms_ble_data(const uint8_t &handle, const std
     ESP_LOGW(TAG, "Invalid response received: %s", format_hex_pretty(&data.front(), data.size()).c_str());  // NOLINT
     return;
   }
+
+  this->reset_online_status_tracker_();
 
   uint8_t frame_type = data[2];
 
@@ -533,6 +538,7 @@ void TianpowerBmsBle::decode_cell_voltages_data_(const uint8_t &chunk, const std
 void TianpowerBmsBle::dump_config() {  // NOLINT(google-readability-function-size,readability-function-size)
   ESP_LOGCONFIG(TAG, "TianpowerBmsBle:");
 
+  LOG_BINARY_SENSOR("", "Online Status", this->online_status_binary_sensor_);
   LOG_BINARY_SENSOR("", "Charging", this->charging_binary_sensor_);
   LOG_BINARY_SENSOR("", "Discharging", this->discharging_binary_sensor_);
   LOG_BINARY_SENSOR("", "Limiting current", this->limiting_current_binary_sensor_);
@@ -628,6 +634,23 @@ void TianpowerBmsBle::dump_config() {  // NOLINT(google-readability-function-siz
   LOG_TEXT_SENSOR("", "Temperature protection", this->temperature_protection_text_sensor_);
   LOG_TEXT_SENSOR("", "Errors", this->errors_text_sensor_);
 }
+
+void TianpowerBmsBle::track_online_status_() {
+  if (this->no_response_count_ < MAX_NO_RESPONSE_COUNT) {
+    this->no_response_count_++;
+  }
+  if (this->no_response_count_ == MAX_NO_RESPONSE_COUNT) {
+    this->publish_device_unavailable_();
+    this->no_response_count_++;
+  }
+}
+
+void TianpowerBmsBle::reset_online_status_tracker_() {
+  this->no_response_count_ = 0;
+  this->publish_state_(this->online_status_binary_sensor_, true);
+}
+
+void TianpowerBmsBle::publish_device_unavailable_() { this->publish_state_(this->online_status_binary_sensor_, false); }
 
 void TianpowerBmsBle::publish_state_(binary_sensor::BinarySensor *binary_sensor, const bool &state) {
   if (binary_sensor == nullptr)
