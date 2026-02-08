@@ -36,6 +36,9 @@ class TianpowerBmsBle : public esphome::ble_client::BLEClientNode, public Pollin
   void set_balancing_binary_sensor(binary_sensor::BinarySensor *balancing_binary_sensor) {
     balancing_binary_sensor_ = balancing_binary_sensor;
   }
+  void set_online_status_binary_sensor(binary_sensor::BinarySensor *online_status_binary_sensor) {
+    online_status_binary_sensor_ = online_status_binary_sensor;
+  }
 
   void set_total_voltage_sensor(sensor::Sensor *total_voltage_sensor) { total_voltage_sensor_ = total_voltage_sensor; }
   void set_current_sensor(sensor::Sensor *current_sensor) { current_sensor_ = current_sensor; }
@@ -138,6 +141,9 @@ class TianpowerBmsBle : public esphome::ble_client::BLEClientNode, public Pollin
   binary_sensor::BinarySensor *discharging_binary_sensor_;
   binary_sensor::BinarySensor *limiting_current_binary_sensor_;
   binary_sensor::BinarySensor *balancing_binary_sensor_;
+  binary_sensor::BinarySensor *online_status_binary_sensor_;
+
+  uint8_t no_response_count_{0};
 
   sensor::Sensor *total_voltage_sensor_;
   sensor::Sensor *current_sensor_;
@@ -204,6 +210,9 @@ class TianpowerBmsBle : public esphome::ble_client::BLEClientNode, public Pollin
   void publish_state_(binary_sensor::BinarySensor *binary_sensor, const bool &state);
   void publish_state_(sensor::Sensor *sensor, float value);
   void publish_state_(text_sensor::TextSensor *text_sensor, const std::string &state);
+  void publish_device_unavailable_();
+  void reset_online_status_tracker_();
+  void track_online_status_();
   bool send_command_(uint8_t function);
   std::string bitmask_to_string_(const char *const messages[], const uint8_t &messages_size, const uint16_t &mask);
 
