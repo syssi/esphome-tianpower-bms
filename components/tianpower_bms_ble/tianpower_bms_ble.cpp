@@ -222,7 +222,6 @@ void TianpowerBmsBle::gattc_event_handler(esp_gattc_cb_event_t event, esp_gatt_i
 
 void TianpowerBmsBle::update() {
   this->track_online_status_();
-
   if (this->node_state != espbt::ClientState::ESTABLISHED) {
     ESP_LOGW(TAG, "[%s] Not connected", ADDR_STR(this->parent_->address_str()));
     return;
