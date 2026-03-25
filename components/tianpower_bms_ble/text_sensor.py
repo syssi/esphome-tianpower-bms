@@ -6,8 +6,6 @@ from . import CONF_TIANPOWER_BMS_BLE_ID, TIANPOWER_BMS_BLE_COMPONENT_SCHEMA
 
 DEPENDENCIES = ["tianpower_bms_ble"]
 
-CODEOWNERS = ["@syssi"]
-
 CONF_SOFTWARE_VERSION = "software_version"
 CONF_DEVICE_MODEL = "device_model"
 CONF_VOLTAGE_PROTECTION = "voltage_protection"
