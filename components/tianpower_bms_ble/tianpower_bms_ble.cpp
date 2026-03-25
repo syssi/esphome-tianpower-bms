@@ -233,7 +233,7 @@ void TianpowerBmsBle::update() {
 }
 
 void TianpowerBmsBle::on_tianpower_bms_ble_data(const uint8_t &handle, const std::vector<uint8_t> &data) {
-  if (data[0] != TIANPOWER_PKT_START || data.back() != TIANPOWER_PKT_END || data.size() != MAX_RESPONSE_SIZE) {
+  if (data.size() != MAX_RESPONSE_SIZE || data[0] != TIANPOWER_PKT_START || data.back() != TIANPOWER_PKT_END) {
     ESP_LOGW(TAG, "Invalid response received: %s", format_hex_pretty(&data.front(), data.size()).c_str());  // NOLINT
     return;
   }
