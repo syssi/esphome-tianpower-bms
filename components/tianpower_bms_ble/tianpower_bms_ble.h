@@ -188,9 +188,9 @@ class TianpowerBmsBle : public esphome::ble_client::BLEClientNode, public Pollin
   } temperatures_[8];
 
   std::vector<uint8_t> frame_buffer_;
-  uint16_t char_notify_handle_;
-  uint16_t char_notify2_handle_;
-  uint16_t char_command_handle_;
+  uint16_t char_notify_handle_{0};
+  uint16_t char_notify2_handle_{0};
+  uint16_t char_command_handle_{0};
 
   float min_cell_voltage_{100.0f};
   float max_cell_voltage_{-100.0f};
