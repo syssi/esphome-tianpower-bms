@@ -315,7 +315,7 @@ void TianpowerBmsBle::decode_status_data_(const std::vector<uint8_t> &data) {
     return (uint16_t(data[i + 0]) << 8) | (uint16_t(data[i + 1]) << 0);
   };
 
-  ESP_LOGI(TAG, "Status frame received");
+  ESP_LOGD(TAG, "Status frame received");
   ESP_LOGD(TAG, "  %s", format_hex_pretty(&data.front(), data.size()).c_str());  // NOLINT
 
   // Byte Len Payload      Description                      Unit  Precision
@@ -359,7 +359,7 @@ void TianpowerBmsBle::decode_general_info_data_(const std::vector<uint8_t> &data
     return (uint16_t(data[i + 0]) << 8) | (uint16_t(data[i + 1]) << 0);
   };
 
-  ESP_LOGI(TAG, "General info frame received");
+  ESP_LOGD(TAG, "General info frame received");
   ESP_LOGD(TAG, "  %s", format_hex_pretty(&data.front(), data.size()).c_str());  // NOLINT
 
   // Byte Len Payload      Description                      Unit  Precision
@@ -408,7 +408,7 @@ void TianpowerBmsBle::decode_mosfet_status_data_(const std::vector<uint8_t> &dat
     return (uint16_t(data[i + 0]) << 8) | (uint16_t(data[i + 1]) << 0);
   };
 
-  ESP_LOGI(TAG, "Mosfet status frame received");
+  ESP_LOGD(TAG, "Mosfet status frame received");
   ESP_LOGD(TAG, "  %s", format_hex_pretty(&data.front(), data.size()).c_str());  // NOLINT
 
   // Byte Len Payload      Description                      Unit  Precision
@@ -452,7 +452,7 @@ void TianpowerBmsBle::decode_temperature_data_(const std::vector<uint8_t> &data)
     return (uint16_t(data[i + 0]) << 8) | (uint16_t(data[i + 1]) << 0);
   };
 
-  ESP_LOGI(TAG, "Temperature frame received");
+  ESP_LOGD(TAG, "Temperature frame received");
   ESP_LOGD(TAG, "  %s", format_hex_pretty(&data.front(), data.size()).c_str());  // NOLINT
 
   // Byte Len Payload      Description                      Unit  Precision
@@ -483,7 +483,7 @@ void TianpowerBmsBle::decode_cell_voltages_data_(const uint8_t &chunk, const std
   uint8_t offset = 8 * chunk;
   uint32_t current_time = millis();
 
-  ESP_LOGI(TAG, "Cell voltages frame (chunk %d) received", chunk);
+  ESP_LOGD(TAG, "Cell voltages frame (chunk %d) received", chunk);
   ESP_LOGD(TAG, "  %s", format_hex_pretty(&data.front(), data.size()).c_str());  // NOLINT
 
   // Reset on new cycle (chunk 0) or timeout
