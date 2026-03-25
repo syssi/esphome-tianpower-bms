@@ -290,7 +290,9 @@ void TianpowerBmsBle::decode_software_version_data_(const std::vector<uint8_t> &
   //  2    1  0x81         Address
 
   //  3    16 0x30 0x2e 0x31 0x2e 0x31 0x30 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00    "0.1.10"
-  this->publish_state_(this->software_version_text_sensor_, std::string(data.begin() + 3, data.end() - 1));
+  auto software_version_begin = data.begin() + 3;
+  this->publish_state_(this->software_version_text_sensor_,
+                       std::string(software_version_begin, std::find(software_version_begin, data.end() - 1, '\0')));
 
   //  19   1  0xaa         End of frame
 }
@@ -305,7 +307,9 @@ void TianpowerBmsBle::decode_hardware_version_data_(const std::vector<uint8_t> &
   //  2    1  0x82         Address
 
   //  3    16 0x54 0x50 0x2d 0x4c 0x54 0x35 0x35 0x00 0x54 0x42 0x00 0x00 0x00 0x00 0x00 0x00    "TP-LT55" "TB"
-  this->publish_state_(this->device_model_text_sensor_, std::string(data.begin() + 3, data.end() - 1));
+  auto device_model_begin = data.begin() + 3;
+  this->publish_state_(this->device_model_text_sensor_,
+                       std::string(device_model_begin, std::find(device_model_begin, data.end() - 1, '\0')));
 
   //  19   1  0xaa         End of frame
 }
