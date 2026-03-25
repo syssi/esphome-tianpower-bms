@@ -11,6 +11,7 @@ from esphome.const import (
     DEVICE_CLASS_VOLTAGE,
     ENTITY_CATEGORY_DIAGNOSTIC,
     STATE_CLASS_MEASUREMENT,
+    STATE_CLASS_TOTAL_INCREASING,
     UNIT_AMPERE,
     UNIT_CELSIUS,
     UNIT_PERCENT,
@@ -260,7 +261,7 @@ CONFIG_SCHEMA = TIANPOWER_BMS_BLE_COMPONENT_SCHEMA.extend(
             icon=ICON_CHARGING_CYCLES,
             accuracy_decimals=0,
             device_class=None,
-            state_class=STATE_CLASS_MEASUREMENT,
+            state_class=STATE_CLASS_TOTAL_INCREASING,
         ),
         cv.Optional(CONF_MIN_CELL_VOLTAGE): sensor.sensor_schema(
             unit_of_measurement=UNIT_VOLT,
