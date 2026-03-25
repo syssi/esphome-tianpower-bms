@@ -7,8 +7,6 @@ from . import CONF_TIANPOWER_BMS_BLE_ID, TIANPOWER_BMS_BLE_COMPONENT_SCHEMA
 
 DEPENDENCIES = ["tianpower_bms_ble"]
 
-CODEOWNERS = ["@syssi"]
-
 CONF_ONLINE_STATUS = "online_status"
 CONF_CHARGING = "charging"
 CONF_DISCHARGING = "discharging"

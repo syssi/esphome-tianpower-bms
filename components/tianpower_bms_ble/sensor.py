@@ -21,8 +21,6 @@ from . import CONF_TIANPOWER_BMS_BLE_ID, TIANPOWER_BMS_BLE_COMPONENT_SCHEMA
 
 DEPENDENCIES = ["tianpower_bms_ble"]
 
-CODEOWNERS = ["@syssi"]
-
 CONF_TOTAL_VOLTAGE = "total_voltage"
 # CONF_CURRENT = "current"
 # CONF_POWER = "power"
