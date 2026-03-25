@@ -677,6 +677,7 @@ void TianpowerBmsBle::publish_state_(text_sensor::TextSensor *text_sensor, const
 
 void TianpowerBmsBle::write_register(uint8_t address, uint16_t value) {
   // this->send_command_(TIANPOWER_CMD_WRITE, TIANPOWER_CMD_MOS);  // @TODO: Pass value
+  ESP_LOGW(TAG, "write_register is not implemented yet!");
 }
 
 bool TianpowerBmsBle::send_command_(uint8_t function) {
