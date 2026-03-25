@@ -31,14 +31,6 @@ CONF_CELL_BALANCING_13 = "cell_balancing_13"
 CONF_CELL_BALANCING_14 = "cell_balancing_14"
 CONF_CELL_BALANCING_15 = "cell_balancing_15"
 CONF_CELL_BALANCING_16 = "cell_balancing_16"
-CONF_CELL_BALANCING_17 = "cell_balancing_17"
-CONF_CELL_BALANCING_18 = "cell_balancing_18"
-CONF_CELL_BALANCING_19 = "cell_balancing_19"
-CONF_CELL_BALANCING_20 = "cell_balancing_20"
-CONF_CELL_BALANCING_21 = "cell_balancing_21"
-CONF_CELL_BALANCING_22 = "cell_balancing_22"
-CONF_CELL_BALANCING_23 = "cell_balancing_23"
-CONF_CELL_BALANCING_24 = "cell_balancing_24"
 
 BINARY_SENSORS = [
     CONF_ONLINE_STATUS,
@@ -65,14 +57,6 @@ CELL_BALANCING_SENSORS = [
     CONF_CELL_BALANCING_14,
     CONF_CELL_BALANCING_15,
     CONF_CELL_BALANCING_16,
-    CONF_CELL_BALANCING_17,
-    CONF_CELL_BALANCING_18,
-    CONF_CELL_BALANCING_19,
-    CONF_CELL_BALANCING_20,
-    CONF_CELL_BALANCING_21,
-    CONF_CELL_BALANCING_22,
-    CONF_CELL_BALANCING_23,
-    CONF_CELL_BALANCING_24,
 ]
 
 CONFIG_SCHEMA = TIANPOWER_BMS_BLE_COMPONENT_SCHEMA.extend(
@@ -139,30 +123,6 @@ CONFIG_SCHEMA = TIANPOWER_BMS_BLE_COMPONENT_SCHEMA.extend(
             icon="mdi:scale-balance"
         ),
         cv.Optional(CONF_CELL_BALANCING_16): binary_sensor.binary_sensor_schema(
-            icon="mdi:scale-balance"
-        ),
-        cv.Optional(CONF_CELL_BALANCING_17): binary_sensor.binary_sensor_schema(
-            icon="mdi:scale-balance"
-        ),
-        cv.Optional(CONF_CELL_BALANCING_18): binary_sensor.binary_sensor_schema(
-            icon="mdi:scale-balance"
-        ),
-        cv.Optional(CONF_CELL_BALANCING_19): binary_sensor.binary_sensor_schema(
-            icon="mdi:scale-balance"
-        ),
-        cv.Optional(CONF_CELL_BALANCING_20): binary_sensor.binary_sensor_schema(
-            icon="mdi:scale-balance"
-        ),
-        cv.Optional(CONF_CELL_BALANCING_21): binary_sensor.binary_sensor_schema(
-            icon="mdi:scale-balance"
-        ),
-        cv.Optional(CONF_CELL_BALANCING_22): binary_sensor.binary_sensor_schema(
-            icon="mdi:scale-balance"
-        ),
-        cv.Optional(CONF_CELL_BALANCING_23): binary_sensor.binary_sensor_schema(
-            icon="mdi:scale-balance"
-        ),
-        cv.Optional(CONF_CELL_BALANCING_24): binary_sensor.binary_sensor_schema(
             icon="mdi:scale-balance"
         ),
     }
