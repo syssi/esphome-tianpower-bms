@@ -194,6 +194,8 @@ class TianpowerBmsBle : public esphome::ble_client::BLEClientNode, public Pollin
 
   float min_cell_voltage_{100.0f};
   float max_cell_voltage_{-100.0f};
+  float sum_cell_voltage_{0.0f};
+  uint8_t count_cell_voltage_{0};
   uint8_t max_voltage_cell_{0};
   uint8_t min_voltage_cell_{0};
 
