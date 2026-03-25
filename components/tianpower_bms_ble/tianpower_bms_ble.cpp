@@ -494,7 +494,9 @@ void TianpowerBmsBle::decode_cell_voltages_data_(const uint8_t &chunk, const std
   if (chunk == 0 || (current_time - this->last_cell_voltages_chunk_timestamp_) > 5000) {
     this->cell_voltages_chunks_received_ = 0;
     this->min_cell_voltage_ = 100.0f;
-    this->max_cell_voltage_ = -100.0f;
+    this->max_cell_voltage_ = 0.0f;
+    this->sum_cell_voltages_ = 0.0f;
+    this->count_cell_voltages_ = 0;
     this->last_cell_voltages_chunk_timestamp_ = current_time;
   }
 
@@ -518,9 +520,13 @@ void TianpowerBmsBle::decode_cell_voltages_data_(const uint8_t &chunk, const std
       this->min_cell_voltage_ = cell_voltage;
       this->min_voltage_cell_ = i + offset + 1;
     }
-    if (cell_voltage > this->max_cell_voltage_) {
+    if (cell_voltage > 0 && cell_voltage > this->max_cell_voltage_) {
       this->max_cell_voltage_ = cell_voltage;
       this->max_voltage_cell_ = i + offset + 1;
+    }
+    if (cell_voltage > 0) {
+      this->sum_cell_voltages_ += cell_voltage;
+      this->count_cell_voltages_++;
     }
     this->publish_state_(this->cells_[i + offset].cell_voltage_sensor_, cell_voltage);
   }
@@ -531,6 +537,8 @@ void TianpowerBmsBle::decode_cell_voltages_data_(const uint8_t &chunk, const std
     this->publish_state_(this->max_voltage_cell_sensor_, (float) this->max_voltage_cell_);
     this->publish_state_(this->min_voltage_cell_sensor_, (float) this->min_voltage_cell_);
     this->publish_state_(this->delta_cell_voltage_sensor_, this->max_cell_voltage_ - this->min_cell_voltage_);
+    this->publish_state_(this->average_cell_voltage_sensor_,
+                         this->count_cell_voltages_ > 0 ? this->sum_cell_voltages_ / this->count_cell_voltages_ : NAN);
 
     this->cell_voltages_chunks_received_ = 0;
   }
