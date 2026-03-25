@@ -34,22 +34,22 @@ TEXT_SENSORS = [
 CONFIG_SCHEMA = TIANPOWER_BMS_BLE_COMPONENT_SCHEMA.extend(
     {
         cv.Optional(CONF_SOFTWARE_VERSION): text_sensor.text_sensor_schema(
-            text_sensor.TextSensor, icon=ICON_SOFTWARE_VERSION
+            icon=ICON_SOFTWARE_VERSION
         ),
         cv.Optional(CONF_DEVICE_MODEL): text_sensor.text_sensor_schema(
-            text_sensor.TextSensor, icon=ICON_DEVICE_MODEL
+            icon=ICON_DEVICE_MODEL
         ),
         cv.Optional(CONF_VOLTAGE_PROTECTION): text_sensor.text_sensor_schema(
-            text_sensor.TextSensor, icon=ICON_VOLTAGE_PROTECTION
+            icon=ICON_VOLTAGE_PROTECTION
         ),
         cv.Optional(CONF_CURRENT_PROTECTION): text_sensor.text_sensor_schema(
-            text_sensor.TextSensor, icon=ICON_CURRENT_PROTECTION
+            icon=ICON_CURRENT_PROTECTION
         ),
         cv.Optional(CONF_TEMPERATURE_PROTECTION): text_sensor.text_sensor_schema(
-            text_sensor.TextSensor, icon=ICON_TEMPERATURE_PROTECTION
+            icon=ICON_TEMPERATURE_PROTECTION
         ),
         cv.Optional(CONF_ERRORS): text_sensor.text_sensor_schema(
-            text_sensor.TextSensor, icon=ICON_ERRORS
+            icon=ICON_ERRORS
         ),
     }
 )
