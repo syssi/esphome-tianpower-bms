@@ -5,6 +5,7 @@ from esphome.const import ENTITY_CATEGORY_DIAGNOSTIC
 
 from . import CONF_TIANPOWER_BMS_BLE_ID, TIANPOWER_BMS_BLE_COMPONENT_SCHEMA
 
+CODEOWNERS = ["@syssi"]
 DEPENDENCIES = ["tianpower_bms_ble"]
 
 CONF_SOFTWARE_VERSION = "software_version"
