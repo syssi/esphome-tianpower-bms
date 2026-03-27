@@ -24,6 +24,7 @@ from esphome.const import (
 
 from . import CONF_TIANPOWER_BMS_BLE_ID, TIANPOWER_BMS_BLE_COMPONENT_SCHEMA
 
+CODEOWNERS = ["@syssi"]
 DEPENDENCIES = ["tianpower_bms_ble"]
 
 CONF_TOTAL_VOLTAGE = "total_voltage"
