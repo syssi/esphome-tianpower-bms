@@ -48,4 +48,4 @@ sensor:
   - platform: tianpower_bms_ble
     tianpower_bms_ble_id: bms0
     total_voltage:
-      name: "${name} total voltage"
+      name: "total voltage"
