@@ -157,7 +157,7 @@ Byte Len Payload      Description                      Unit  Precision
 ## Cell voltages frame (3 frames / chunks)
 
 ```
-Request:  0x55 0x04 0x88 0xaa 
+Request:  0x55 0x04 0x88 0xaa
 Response: 0x55 0x14 0x88 0x0c 0xc1 0x0c 0xd5 0x0c 0xd2 0x0c 0xd5 0x0c 0xc8 0x0c 0xd4 0x0c 0xc8 0x0c 0xd2 0xaa
 
 Byte Len Payload      Description                      Unit  Precision
@@ -167,7 +167,7 @@ Byte Len Payload      Description                      Unit  Precision
  3    2  0x96 0x0C    Cell voltage 1                   V     0.001f  3.265V
  5    2  0x97 0x0C    Cell voltage 2                   V     0.001f  3.285V
  7    2  0x98 0x0C    Cell voltage 3                   V     0.001f  3.282V
- 9    2  0x98 0x0C    Cell voltage 4                   V     0.001f 
+ 9    2  0x98 0x0C    Cell voltage 4                   V     0.001f
  11   2  0x96 0x0C    Cell voltage 5                   V     0.001f
  13   2  0x96 0x0C    Cell voltage 6                   V     0.001f
  15   2  0x98 0x0C    Cell voltage 7                   V     0.001f
@@ -185,7 +185,7 @@ Byte Len Payload      Description                      Unit  Precision
  3    2  0x0c 0xc8    Cell voltage 9                   V     0.001f
  5    2  0x0c 0xc8    Cell voltage 10                  V     0.001f
  7    2  0x0c 0xc7    Cell voltage 11                  V     0.001f
- 9    2  0x0c 0xc7    Cell voltage 12                  V     0.001f 
+ 9    2  0x0c 0xc7    Cell voltage 12                  V     0.001f
  11   2  0x0c 0xc1    Cell voltage 13                  V     0.001f
  13   2  0x0c 0xc3    Cell voltage 14                  V     0.001f
  15   2  0x0c 0xca    Cell voltage 15                  V     0.001f
