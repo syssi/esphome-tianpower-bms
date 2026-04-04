@@ -28,8 +28,6 @@ BINARY_SENSOR_DEFS = {
     CONF_BALANCING: {"icon": "mdi:scale-balance"},
 }
 
-BINARY_SENSORS = list(BINARY_SENSOR_DEFS)
-
 _CELL_BALANCING_SCHEMA = binary_sensor.binary_sensor_schema(icon="mdi:scale-balance")
 
 CONFIG_SCHEMA = TIANPOWER_BMS_BLE_COMPONENT_SCHEMA.extend(
@@ -45,7 +43,7 @@ CONFIG_SCHEMA = TIANPOWER_BMS_BLE_COMPONENT_SCHEMA.extend(
 
 async def to_code(config):
     hub = await cg.get_variable(config[CONF_TIANPOWER_BMS_BLE_ID])
-    for key in BINARY_SENSORS:
+    for key in BINARY_SENSOR_DEFS:
         if key in config:
             conf = config[key]
             sens = await binary_sensor.new_binary_sensor(conf)
