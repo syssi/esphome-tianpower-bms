@@ -50,3 +50,5 @@ sensor:
     tianpower_bms_ble_id: bms0
     total_voltage:
       name: "total voltage"
+    average_cell_voltage:
+      name: "average cell voltage"
