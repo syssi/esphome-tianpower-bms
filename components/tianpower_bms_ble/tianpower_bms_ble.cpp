@@ -48,7 +48,7 @@ static const uint8_t TIANPOWER_COMMAND_QUEUE[TIANPOWER_COMMAND_QUEUE_SIZE] = {
 };
 
 static const uint8_t VOLTAGE_PROTECTION_ERRORS_SIZE = 16;
-static const char *const VOLTAGE_PROTECTION_ERRORS[VOLTAGE_PROTECTION_ERRORS_SIZE] = {
+static constexpr const char *const VOLTAGE_PROTECTION_ERRORS[VOLTAGE_PROTECTION_ERRORS_SIZE] = {
     "Cell overvoltage protection",         // 0000 0000 0000 0001
     "Cell undervoltage protection",        // 0000 0000 0000 0010
     "Pack overvoltage protection",         // 0000 0000 0000 0100
@@ -68,7 +68,7 @@ static const char *const VOLTAGE_PROTECTION_ERRORS[VOLTAGE_PROTECTION_ERRORS_SIZ
 };
 
 static const uint8_t TEMPERATURE_PROTECTION_ERRORS_SIZE = 16;
-static const char *const TEMPERATURE_PROTECTION_ERRORS[TEMPERATURE_PROTECTION_ERRORS_SIZE] = {
+static constexpr const char *const TEMPERATURE_PROTECTION_ERRORS[TEMPERATURE_PROTECTION_ERRORS_SIZE] = {
     "Charge over temperature protection",      // 0000 0000 0000 0001
     "Charge under temperature protection",     // 0000 0000 0000 0010
     "Discharge over temperature protection",   // 0000 0000 0000 0100
@@ -88,7 +88,7 @@ static const char *const TEMPERATURE_PROTECTION_ERRORS[TEMPERATURE_PROTECTION_ER
 };
 
 static const uint8_t CURRENT_PROTECTION_ERRORS_SIZE = 16;
-static const char *const CURRENT_PROTECTION_ERRORS[CURRENT_PROTECTION_ERRORS_SIZE] = {
+static constexpr const char *const CURRENT_PROTECTION_ERRORS[CURRENT_PROTECTION_ERRORS_SIZE] = {
     "Charge overcurrent protection",       // 0000 0000 0000 0001
     "Short circuit protection",            // 0000 0000 0000 0010
     "Discharge overcurrent 1 protection",  // 0000 0000 0000 0100
@@ -108,7 +108,7 @@ static const char *const CURRENT_PROTECTION_ERRORS[CURRENT_PROTECTION_ERRORS_SIZ
 };
 
 static const uint8_t ERRORS_SIZE = 16;
-static const char *const ERRORS[ERRORS_SIZE] = {
+static constexpr const char *const ERRORS[ERRORS_SIZE] = {
     "Cell voltage differential alarm",  // 0000 0000 0000 0001
     "Charge MOS damage alarm",          // 0000 0000 0000 0010
     "External SD card failure alarm",   // 0000 0000 0000 0100
