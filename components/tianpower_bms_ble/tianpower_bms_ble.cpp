@@ -127,6 +127,8 @@ static constexpr const char *const ERRORS[ERRORS_SIZE] = {
     "Discharge MOS failure",            // 1000 0000 0000 0000
 };
 
+#ifdef USE_ESP32
+
 void TianpowerBmsBle::gattc_event_handler(esp_gattc_cb_event_t event, esp_gatt_if_t gattc_if,
                                           esp_ble_gattc_cb_param_t *param) {
   switch (event) {
@@ -220,6 +222,7 @@ void TianpowerBmsBle::gattc_event_handler(esp_gattc_cb_event_t event, esp_gatt_i
   }
 }
 
+#ifdef USE_ESP32
 void TianpowerBmsBle::update() {
   this->track_online_status_();
   if (this->node_state != espbt::ClientState::ESTABLISHED) {
@@ -231,6 +234,9 @@ void TianpowerBmsBle::update() {
     this->send_command_(command);
   }
 }
+#else
+void TianpowerBmsBle::update() {}
+#endif
 
 void TianpowerBmsBle::on_tianpower_bms_ble_data(const uint8_t &handle, const std::vector<uint8_t> &data) {
   if (data.size() != MAX_RESPONSE_SIZE || data[0] != TIANPOWER_PKT_START || data.back() != TIANPOWER_PKT_END) {
@@ -709,6 +715,8 @@ bool TianpowerBmsBle::send_command_(uint8_t function) {
 
   return (status == 0);
 }
+
+#endif  // USE_ESP32
 
 std::string TianpowerBmsBle::bitmask_to_string_(const char *const messages[], const uint8_t &messages_size,
                                                 const uint16_t &mask) {
