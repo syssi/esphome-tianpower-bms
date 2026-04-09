@@ -77,3 +77,14 @@ class TestTextSensorConstants:
         assert text_sensor.CONF_DEVICE_MODEL in text_sensor.TEXT_SENSORS
         assert text_sensor.CONF_ERRORS in text_sensor.TEXT_SENSORS
         assert len(text_sensor.TEXT_SENSORS) == 6
+
+
+class TestCellBalancingSensorList:
+    def test_cell_balancing_count(self):
+        assert len(binary_sensor.CELL_BALANCING_SENSORS) == 24
+
+    def test_cell_balancing_naming(self):
+        assert binary_sensor.CELL_BALANCING_SENSORS[0] == "cell_balancing_1"
+        assert binary_sensor.CELL_BALANCING_SENSORS[23] == "cell_balancing_24"
+        for i, key in enumerate(binary_sensor.CELL_BALANCING_SENSORS, 1):
+            assert key == f"cell_balancing_{i}"
