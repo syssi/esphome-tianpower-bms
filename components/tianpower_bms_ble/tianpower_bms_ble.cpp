@@ -268,11 +268,11 @@ void TianpowerBmsBle::on_tianpower_bms_ble_data(const uint8_t &handle, const std
       break;
     case TIANPOWER_FRAME_TYPE_LOCATION:
     case TIANPOWER_FRAME_TYPE_LOCATION + 1:
-      ESP_LOGD(TAG, "The location frame isn't supported yet");
+      this->decode_location_data_(data);
       break;
     case TIANPOWER_FRAME_TYPE_OWNER:
     case TIANPOWER_FRAME_TYPE_OWNER + 1:
-      ESP_LOGD(TAG, "The owner frame isn't supported yet");
+      this->decode_owner_data_(data);
       break;
     default:
       ESP_LOGW(TAG, "Unhandled response received (frame_type 0x%02X): %s", frame_type,
@@ -546,6 +546,62 @@ void TianpowerBmsBle::decode_cell_voltages_data_(const uint8_t &chunk, const std
   //  19   1  0xaa         End of frame
 }
 
+void TianpowerBmsBle::decode_location_data_(const std::vector<uint8_t> &data) {
+  ESP_LOGI(TAG, "Location frame received");
+  ESP_LOGD(TAG, "  %s", format_hex_pretty(&data.front(), data.size()).c_str());  // NOLINT
+
+  uint8_t frame_type = data[2];
+  size_t payload_len = data.size() - 4;
+
+  if (frame_type == TIANPOWER_FRAME_TYPE_LOCATION) {
+    this->location_offset_ = 0;
+    memcpy(this->location_string_, &data[3], payload_len);
+    this->location_string_[payload_len] = '\0';
+    this->location_part_received_ = true;
+  } else if (frame_type == TIANPOWER_FRAME_TYPE_LOCATION + 1) {
+    if (!this->location_part_received_) {
+      this->location_offset_ = 16;
+      memcpy(this->location_string_, &data[3], payload_len);
+      this->location_string_[payload_len] = '\0';
+      this->location_part_received_ = true;
+    } else {
+      memcpy(this->location_string_ + this->location_offset_, &data[3], payload_len);
+      this->location_string_[this->location_offset_ + payload_len] = '\0';
+      this->publish_state_(this->location_text_sensor_, std::string(this->location_string_));
+      this->location_part_received_ = false;
+      this->location_offset_ = 0;
+    }
+  }
+}
+
+void TianpowerBmsBle::decode_owner_data_(const std::vector<uint8_t> &data) {
+  ESP_LOGI(TAG, "Owner frame received");
+  ESP_LOGD(TAG, "  %s", format_hex_pretty(&data.front(), data.size()).c_str());  // NOLINT
+
+  uint8_t frame_type = data[2];
+  size_t payload_len = data.size() - 4;
+
+  if (frame_type == TIANPOWER_FRAME_TYPE_OWNER) {
+    this->owner_offset_ = 0;
+    memcpy(this->owner_string_, &data[3], payload_len);
+    this->owner_string_[payload_len] = '\0';
+    this->owner_part_received_ = true;
+  } else if (frame_type == TIANPOWER_FRAME_TYPE_OWNER + 1) {
+    if (!this->owner_part_received_) {
+      this->owner_offset_ = 16;
+      memcpy(this->owner_string_, &data[3], payload_len);
+      this->owner_string_[payload_len] = '\0';
+      this->owner_part_received_ = true;
+    } else {
+      memcpy(this->owner_string_ + this->owner_offset_, &data[3], payload_len);
+      this->owner_string_[this->owner_offset_ + payload_len] = '\0';
+      this->publish_state_(this->owner_text_sensor_, std::string(this->owner_string_));
+      this->owner_part_received_ = false;
+      this->owner_offset_ = 0;
+    }
+  }
+}
+
 void TianpowerBmsBle::dump_config() {  // NOLINT(google-readability-function-size,readability-function-size)
   ESP_LOGCONFIG(TAG, "TianpowerBmsBle:");
 
@@ -643,6 +699,8 @@ void TianpowerBmsBle::dump_config() {  // NOLINT(google-readability-function-siz
   LOG_TEXT_SENSOR("", "Current protection", this->current_protection_text_sensor_);
   LOG_TEXT_SENSOR("", "Temperature protection", this->temperature_protection_text_sensor_);
   LOG_TEXT_SENSOR("", "Errors", this->errors_text_sensor_);
+  LOG_TEXT_SENSOR("", "Location", this->location_text_sensor_);
+  LOG_TEXT_SENSOR("", "Owner", this->owner_text_sensor_);
 }
 
 void TianpowerBmsBle::track_online_status_() {
