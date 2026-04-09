@@ -113,8 +113,8 @@ static const std::vector<uint8_t> TEMPERATURES_FRAME_1 = {
 };
 
 // Cell voltages frame (0x88) - cells 1-8 ────────────────────────────────────────
-// C1=3.285V  C2=3.285V  C3=3.282V  C4=3.282V  C5=3.282V  C6=3.285V  C7=3.285V  C8=3.282V
-// min=3.282 max=3.285 delta=0.003
+// C1=3.265V  C2=3.285V  C3=3.282V  C4=3.285V  C5=3.272V  C6=3.284V  C7=3.272V  C8=3.282V
+// min=3.265 max=3.285 delta=0.020
 static const std::vector<uint8_t> CELL_VOLTAGES_FRAME_1_8 = {
     0x55, 0x14, 0x88,  // start | response | address
     0x0c, 0xc1,        // cell_voltage_1 = 0x0CC1 = 3265 * 0.001 = 3.265 V
