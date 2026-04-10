@@ -48,10 +48,12 @@ jobs:
           ref: dev
           path: esphome
 
-      - name: Copy external component into the esphome project
+      - name: Copy external component and tests into the esphome project
         run: |
           cd esphome
           cp -r ../components/* esphome/components/
+          mkdir -p tests/components
+          cp -r ../tests/components/* tests/components/
           git config user.name "ci"
           git config user.email "ci@github.com"
           git add .

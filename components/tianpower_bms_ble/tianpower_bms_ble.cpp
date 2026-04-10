@@ -127,111 +127,6 @@ static constexpr const char *const ERRORS[ERRORS_SIZE] = {
     "Discharge MOS failure",            // 1000 0000 0000 0000
 };
 
-void TianpowerBmsBle::gattc_event_handler(esp_gattc_cb_event_t event, esp_gatt_if_t gattc_if,
-                                          esp_ble_gattc_cb_param_t *param) {
-  switch (event) {
-    case ESP_GATTC_OPEN_EVT: {
-      break;
-    }
-    case ESP_GATTC_DISCONNECT_EVT: {
-      this->node_state = espbt::ClientState::IDLE;
-
-      // this->publish_state_(this->voltage_sensor_, NAN);
-
-      if (this->char_notify_handle_ != 0) {
-        auto status = esp_ble_gattc_unregister_for_notify(this->parent()->get_gattc_if(),
-                                                          this->parent()->get_remote_bda(), this->char_notify_handle_);
-        if (status) {
-          ESP_LOGW(TAG, "esp_ble_gattc_unregister_for_notify failed, status=%d", status);
-        }
-      }
-      this->char_notify_handle_ = 0;
-      this->char_command_handle_ = 0;
-
-      break;
-    }
-    case ESP_GATTC_SEARCH_CMPL_EVT: {
-      // [V][esp32_ble_client:192]: [0] [90:A6:BF:93:A0:69] Service UUID: 0x1800
-      // [V][esp32_ble_client:194]: [0] [90:A6:BF:93:A0:69]  start_handle: 0x1  end_handle: 0x7
-      // [V][esp32_ble_client:192]: [0] [90:A6:BF:93:A0:69] Service UUID: 0x1801
-      // [V][esp32_ble_client:194]: [0] [90:A6:BF:93:A0:69]  start_handle: 0x8  end_handle: 0xf
-      // [V][esp32_ble_client:192]: [0] [90:A6:BF:93:A0:69] Service UUID: 0xFF00
-      // [V][esp32_ble_client:194]: [0] [90:A6:BF:93:A0:69]  start_handle: 0x10  end_handle: 0x18
-
-      auto *char_notify =
-          this->parent_->get_characteristic(TIANPOWER_BMS_SERVICE_UUID, TIANPOWER_BMS_NOTIFY_CHARACTERISTIC_UUID);
-      if (char_notify == nullptr) {
-        ESP_LOGE(TAG, "[%s] No notify service found at device, not an Tianpower BMS..?",
-                 ADDR_STR(this->parent_->address_str()));
-        break;
-      }
-      this->char_notify_handle_ = char_notify->handle;
-
-      auto status = esp_ble_gattc_register_for_notify(this->parent()->get_gattc_if(), this->parent()->get_remote_bda(),
-                                                      char_notify->handle);
-      if (status) {
-        ESP_LOGW(TAG, "esp_ble_gattc_register_for_notify failed, status=%d", status);
-      }
-
-      //      auto *char_notify2 =
-      //          this->parent_->get_characteristic(TIANPOWER_BMS_SERVICE_UUID,
-      //          TIANPOWER_BMS_NOTIFY2_CHARACTERISTIC_UUID);
-      //      if (char_notify2 == nullptr) {
-      //        ESP_LOGE(TAG, "[%s] No notify service found at device, not an Tianpower BMS..?",
-      //                 ADDR_STR(this->parent_->address_str()).c_str());
-      //        break;
-      //      }
-      //      this->char_notify2_handle_ = char_notify->handle;
-      //
-      //      auto status2 = esp_ble_gattc_register_for_notify(this->parent()->get_gattc_if(),
-      //        this->parent()->get_remote_bda(), char_notify->handle);
-      //      if (status2) {
-      //        ESP_LOGW(TAG, "esp_ble_gattc_register_for_notify failed, status=%d", status2);
-      //      }
-
-      auto *char_command =
-          this->parent_->get_characteristic(TIANPOWER_BMS_SERVICE_UUID, TIANPOWER_BMS_CONTROL_CHARACTERISTIC_UUID);
-      if (char_command == nullptr) {
-        ESP_LOGE(TAG, "[%s] No control service found at device, not an Tianpower BMS..?",
-                 ADDR_STR(this->parent_->address_str()));
-        break;
-      }
-      this->char_command_handle_ = char_command->handle;
-      break;
-    }
-    case ESP_GATTC_REG_FOR_NOTIFY_EVT: {
-      this->node_state = espbt::ClientState::ESTABLISHED;
-
-      this->send_command_(TIANPOWER_FRAME_TYPE_SOFTWARE_VERSION);
-      this->send_command_(TIANPOWER_FRAME_TYPE_HARDWARE_VERSION);
-      break;
-    }
-    case ESP_GATTC_NOTIFY_EVT: {
-      ESP_LOGV(TAG, "Notification received (handle 0x%02X): %s", param->notify.handle,
-               format_hex_pretty(param->notify.value, param->notify.value_len).c_str());  // NOLINT
-
-      std::vector<uint8_t> data(param->notify.value, param->notify.value + param->notify.value_len);
-
-      this->on_tianpower_bms_ble_data(param->notify.handle, data);
-      break;
-    }
-    default:
-      break;
-  }
-}
-
-void TianpowerBmsBle::update() {
-  this->track_online_status_();
-  if (this->node_state != espbt::ClientState::ESTABLISHED) {
-    ESP_LOGW(TAG, "[%s] Not connected", ADDR_STR(this->parent_->address_str()));
-    return;
-  }
-
-  for (uint8_t command : TIANPOWER_COMMAND_QUEUE) {
-    this->send_command_(command);
-  }
-}
-
 void TianpowerBmsBle::on_tianpower_bms_ble_data(const uint8_t &handle, const std::vector<uint8_t> &data) {
   if (data.size() != MAX_RESPONSE_SIZE || data[0] != TIANPOWER_PKT_START || data.back() != TIANPOWER_PKT_END) {
     ESP_LOGW(TAG, "Invalid response received: %s", format_hex_pretty(&data.front(), data.size()).c_str());  // NOLINT
@@ -688,6 +583,113 @@ void TianpowerBmsBle::write_register(uint8_t address, uint16_t value) {
   ESP_LOGW(TAG, "write_register is not implemented yet!");
 }
 
+#ifdef USE_ESP32
+
+void TianpowerBmsBle::gattc_event_handler(esp_gattc_cb_event_t event, esp_gatt_if_t gattc_if,
+                                          esp_ble_gattc_cb_param_t *param) {
+  switch (event) {
+    case ESP_GATTC_OPEN_EVT: {
+      break;
+    }
+    case ESP_GATTC_DISCONNECT_EVT: {
+      this->node_state = espbt::ClientState::IDLE;
+
+      // this->publish_state_(this->voltage_sensor_, NAN);
+
+      if (this->char_notify_handle_ != 0) {
+        auto status = esp_ble_gattc_unregister_for_notify(this->parent()->get_gattc_if(),
+                                                          this->parent()->get_remote_bda(), this->char_notify_handle_);
+        if (status) {
+          ESP_LOGW(TAG, "esp_ble_gattc_unregister_for_notify failed, status=%d", status);
+        }
+      }
+      this->char_notify_handle_ = 0;
+      this->char_command_handle_ = 0;
+
+      break;
+    }
+    case ESP_GATTC_SEARCH_CMPL_EVT: {
+      // [V][esp32_ble_client:192]: [0] [90:A6:BF:93:A0:69] Service UUID: 0x1800
+      // [V][esp32_ble_client:194]: [0] [90:A6:BF:93:A0:69]  start_handle: 0x1  end_handle: 0x7
+      // [V][esp32_ble_client:192]: [0] [90:A6:BF:93:A0:69] Service UUID: 0x1801
+      // [V][esp32_ble_client:194]: [0] [90:A6:BF:93:A0:69]  start_handle: 0x8  end_handle: 0xf
+      // [V][esp32_ble_client:192]: [0] [90:A6:BF:93:A0:69] Service UUID: 0xFF00
+      // [V][esp32_ble_client:194]: [0] [90:A6:BF:93:A0:69]  start_handle: 0x10  end_handle: 0x18
+
+      auto *char_notify =
+          this->parent_->get_characteristic(TIANPOWER_BMS_SERVICE_UUID, TIANPOWER_BMS_NOTIFY_CHARACTERISTIC_UUID);
+      if (char_notify == nullptr) {
+        ESP_LOGE(TAG, "[%s] No notify service found at device, not an Tianpower BMS..?",
+                 ADDR_STR(this->parent_->address_str()));
+        break;
+      }
+      this->char_notify_handle_ = char_notify->handle;
+
+      auto status = esp_ble_gattc_register_for_notify(this->parent()->get_gattc_if(), this->parent()->get_remote_bda(),
+                                                      char_notify->handle);
+      if (status) {
+        ESP_LOGW(TAG, "esp_ble_gattc_register_for_notify failed, status=%d", status);
+      }
+
+      //      auto *char_notify2 =
+      //          this->parent_->get_characteristic(TIANPOWER_BMS_SERVICE_UUID,
+      //          TIANPOWER_BMS_NOTIFY2_CHARACTERISTIC_UUID);
+      //      if (char_notify2 == nullptr) {
+      //        ESP_LOGE(TAG, "[%s] No notify service found at device, not an Tianpower BMS..?",
+      //                 ADDR_STR(this->parent_->address_str()).c_str());
+      //        break;
+      //      }
+      //      this->char_notify2_handle_ = char_notify->handle;
+      //
+      //      auto status2 = esp_ble_gattc_register_for_notify(this->parent()->get_gattc_if(),
+      //        this->parent()->get_remote_bda(), char_notify->handle);
+      //      if (status2) {
+      //        ESP_LOGW(TAG, "esp_ble_gattc_register_for_notify failed, status=%d", status2);
+      //      }
+
+      auto *char_command =
+          this->parent_->get_characteristic(TIANPOWER_BMS_SERVICE_UUID, TIANPOWER_BMS_CONTROL_CHARACTERISTIC_UUID);
+      if (char_command == nullptr) {
+        ESP_LOGE(TAG, "[%s] No control service found at device, not an Tianpower BMS..?",
+                 ADDR_STR(this->parent_->address_str()));
+        break;
+      }
+      this->char_command_handle_ = char_command->handle;
+      break;
+    }
+    case ESP_GATTC_REG_FOR_NOTIFY_EVT: {
+      this->node_state = espbt::ClientState::ESTABLISHED;
+
+      this->send_command_(TIANPOWER_FRAME_TYPE_SOFTWARE_VERSION);
+      this->send_command_(TIANPOWER_FRAME_TYPE_HARDWARE_VERSION);
+      break;
+    }
+    case ESP_GATTC_NOTIFY_EVT: {
+      ESP_LOGV(TAG, "Notification received (handle 0x%02X): %s", param->notify.handle,
+               format_hex_pretty(param->notify.value, param->notify.value_len).c_str());  // NOLINT
+
+      std::vector<uint8_t> data(param->notify.value, param->notify.value + param->notify.value_len);
+
+      this->on_tianpower_bms_ble_data(param->notify.handle, data);
+      break;
+    }
+    default:
+      break;
+  }
+}
+
+void TianpowerBmsBle::update() {
+  this->track_online_status_();
+  if (this->node_state != espbt::ClientState::ESTABLISHED) {
+    ESP_LOGW(TAG, "[%s] Not connected", ADDR_STR(this->parent_->address_str()));
+    return;
+  }
+
+  for (uint8_t command : TIANPOWER_COMMAND_QUEUE) {
+    this->send_command_(command);
+  }
+}
+
 bool TianpowerBmsBle::send_command_(uint8_t function) {
   uint8_t frame[4];
 
@@ -709,6 +711,13 @@ bool TianpowerBmsBle::send_command_(uint8_t function) {
 
   return (status == 0);
 }
+
+#else
+
+void TianpowerBmsBle::update() {}
+bool TianpowerBmsBle::send_command_(uint8_t function) { return false; }
+
+#endif  // USE_ESP32
 
 std::string TianpowerBmsBle::bitmask_to_string_(const char *const messages[], const uint8_t &messages_size,
                                                 const uint16_t &mask) {

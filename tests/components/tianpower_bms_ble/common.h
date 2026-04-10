@@ -71,10 +71,10 @@ static const std::vector<uint8_t> GENERAL_INFO_FRAME_1 = {
     0xaa,              // end
 };
 
-// Mosfet status frame (0x85) - charging, limiting, no balancing
+// Mosfet status frame (0x85) - charging, discharging, limiting, no balancing
 static const std::vector<uint8_t> MOSFET_STATUS_FRAME_1 = {
     0x55, 0x14, 0x85,  // start | response | address
-    0x08, 0x23,        // mosfet_status = 0x0823: bit1=charging, bit16=limiting
+    0x08, 0x23,        // mosfet_status = 0x0823: bit0=charging, bit1=discharging, bit5=limiting
     0x00, 0x00,        // overvoltage_protection_bitmask = 0
     0x00, 0x00,        // undervoltage_protection_bitmask = 0
     0x00, 0x00,        // high_alarm_bitmask = 0
@@ -122,7 +122,7 @@ static const std::vector<uint8_t> CELL_VOLTAGES_FRAME_1_8 = {
     0x0c, 0xd2,        // cell_voltage_3 = 3.282 V
     0x0c, 0xd5,        // cell_voltage_4 = 3.285 V
     0x0c, 0xc8,        // cell_voltage_5 = 3.272 V
-    0x0c, 0xd4,        // cell_voltage_6 = 3.276 V
+    0x0c, 0xd4,        // cell_voltage_6 = 3.284 V
     0x0c, 0xc8,        // cell_voltage_7 = 3.272 V
     0x0c, 0xd2,        // cell_voltage_8 = 3.282 V
     0xaa,              // end
