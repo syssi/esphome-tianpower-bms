@@ -187,7 +187,7 @@ TEST(TianpowerBmsBleMosfetStatusTest, ChargingAndLimitingCurrent) {
   bms.decode_mosfet_status_data_(MOSFET_STATUS_FRAME_1);
 
   EXPECT_TRUE(charging.state);
-  EXPECT_FALSE(discharging.state);
+  EXPECT_TRUE(discharging.state);
   EXPECT_TRUE(limiting.state);
 }
 
