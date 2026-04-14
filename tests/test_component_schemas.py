@@ -76,7 +76,9 @@ class TestTextSensorConstants:
         assert text_sensor.CONF_SOFTWARE_VERSION in text_sensor.TEXT_SENSORS
         assert text_sensor.CONF_DEVICE_MODEL in text_sensor.TEXT_SENSORS
         assert text_sensor.CONF_ERRORS in text_sensor.TEXT_SENSORS
-        assert len(text_sensor.TEXT_SENSORS) == 6
+        assert text_sensor.CONF_LOCATION in text_sensor.TEXT_SENSORS
+        assert text_sensor.CONF_OWNER in text_sensor.TEXT_SENSORS
+        assert len(text_sensor.TEXT_SENSORS) == 8
 
 
 class TestCellBalancingSensorList:

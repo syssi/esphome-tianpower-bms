@@ -137,6 +137,10 @@ class TianpowerBmsBle :
     temperature_protection_text_sensor_ = temperature_protection_text_sensor;
   }
   void set_errors_text_sensor(text_sensor::TextSensor *errors_text_sensor) { errors_text_sensor_ = errors_text_sensor; }
+  void set_location_text_sensor(text_sensor::TextSensor *location_text_sensor) {
+    location_text_sensor_ = location_text_sensor;
+  }
+  void set_owner_text_sensor(text_sensor::TextSensor *owner_text_sensor) { owner_text_sensor_ = owner_text_sensor; }
 
   void write_register(uint8_t address, uint16_t value);
   void on_tianpower_bms_ble_data(const uint8_t &handle, const std::vector<uint8_t> &data);
@@ -182,6 +186,8 @@ class TianpowerBmsBle :
   text_sensor::TextSensor *current_protection_text_sensor_{nullptr};
   text_sensor::TextSensor *temperature_protection_text_sensor_{nullptr};
   text_sensor::TextSensor *errors_text_sensor_{nullptr};
+  text_sensor::TextSensor *location_text_sensor_{nullptr};
+  text_sensor::TextSensor *owner_text_sensor_{nullptr};
 
   struct Cell {
     sensor::Sensor *cell_voltage_sensor_{nullptr};
@@ -207,6 +213,13 @@ class TianpowerBmsBle :
   uint8_t cell_voltages_chunks_received_{0};
   uint32_t last_cell_voltages_chunk_timestamp_{0};
 
+  bool location_part_received_{false};
+  bool owner_part_received_{false};
+  char location_string_[32]{};
+  char owner_string_[32]{};
+  uint8_t location_offset_{0};
+  uint8_t owner_offset_{0};
+
   void decode_software_version_data_(const std::vector<uint8_t> &data);
   void decode_hardware_version_data_(const std::vector<uint8_t> &data);
   void decode_status_data_(const std::vector<uint8_t> &data);
@@ -214,6 +227,8 @@ class TianpowerBmsBle :
   void decode_mosfet_status_data_(const std::vector<uint8_t> &data);
   void decode_temperature_data_(const std::vector<uint8_t> &data);
   void decode_cell_voltages_data_(const uint8_t &chunk, const std::vector<uint8_t> &data);
+  void decode_location_data_(const std::vector<uint8_t> &data);
+  void decode_owner_data_(const std::vector<uint8_t> &data);
   void publish_state_(binary_sensor::BinarySensor *binary_sensor, const bool &state);
   void publish_state_(sensor::Sensor *sensor, float value);
   void publish_state_(text_sensor::TextSensor *text_sensor, const std::string &state);

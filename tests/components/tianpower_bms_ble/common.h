@@ -15,6 +15,8 @@ class TestableTianpowerBmsBle : public TianpowerBmsBle {
   using TianpowerBmsBle::decode_mosfet_status_data_;
   using TianpowerBmsBle::decode_temperature_data_;
   using TianpowerBmsBle::decode_cell_voltages_data_;
+  using TianpowerBmsBle::decode_location_data_;
+  using TianpowerBmsBle::decode_owner_data_;
   using TianpowerBmsBle::on_tianpower_bms_ble_data;
 };
 
