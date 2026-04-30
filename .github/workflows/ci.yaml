@@ -378,7 +378,7 @@ jobs:
       - name: Install clang-tidy
         run: |
           . venv/bin/activate
-          pip install clang-tidy -c esphome/requirements_dev.txt
+          pip install clang-tidy -c requirements_dev.txt
 
       - name: Run clang-tidy
         run: |
