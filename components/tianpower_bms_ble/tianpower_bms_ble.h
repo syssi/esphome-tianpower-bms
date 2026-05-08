@@ -12,8 +12,7 @@
 namespace espbt = esphome::esp32_ble_tracker;
 #endif
 
-namespace esphome {
-namespace tianpower_bms_ble {
+namespace esphome::tianpower_bms_ble {
 
 class TianpowerBmsBle :
 #ifdef USE_ESP32
@@ -226,5 +225,4 @@ class TianpowerBmsBle :
   bool check_bit_(uint16_t mask, uint16_t flag) { return (mask & flag) == flag; }
 };
 
-}  // namespace tianpower_bms_ble
-}  // namespace esphome
+}  // namespace esphome::tianpower_bms_ble
