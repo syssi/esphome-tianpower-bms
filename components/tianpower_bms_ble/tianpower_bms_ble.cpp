@@ -9,8 +9,7 @@
 #define ADDR_STR(x) (x).c_str()
 #endif
 
-namespace esphome {
-namespace tianpower_bms_ble {
+namespace esphome::tianpower_bms_ble {
 
 static const char *const TAG = "tianpower_bms_ble";
 
@@ -736,5 +735,4 @@ std::string TianpowerBmsBle::bitmask_to_string_(const char *const messages[], co
   return values;
 }
 
-}  // namespace tianpower_bms_ble
-}  // namespace esphome
+}  // namespace esphome::tianpower_bms_ble
