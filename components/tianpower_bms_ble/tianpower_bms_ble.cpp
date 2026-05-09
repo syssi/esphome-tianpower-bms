@@ -720,7 +720,7 @@ bool TianpowerBmsBle::send_command_(uint8_t function) { return false; }
 
 std::string TianpowerBmsBle::bitmask_to_string_(const char *const messages[], const uint8_t &messages_size,
                                                 const uint16_t &mask) {
-  std::string values = "";
+  std::string values;
   if (mask) {
     for (int i = 0; i < messages_size; i++) {
       if (mask & (1 << i)) {
