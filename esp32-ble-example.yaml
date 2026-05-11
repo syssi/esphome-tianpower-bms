@@ -219,3 +219,7 @@ text_sensor:
       name: "temperature protection"
     errors:
       name: "errors"
+    location:
+      name: "location"
+    owner:
+      name: "owner"

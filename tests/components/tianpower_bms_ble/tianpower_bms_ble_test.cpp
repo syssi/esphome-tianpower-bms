@@ -371,4 +371,56 @@ TEST(TianpowerBmsBleDispatchTest, InvalidFrameWrongEnd) {
   EXPECT_FLOAT_EQ(soc.state, -1.0f);
 }
 
+// ── Location frame (0x90, 0x91) ────────────────────────────────────────────────
+
+TEST(TianpowerBmsBleLocationTest, BothFramesCombined) {
+  TestableTianpowerBmsBle bms;
+  text_sensor::TextSensor location;
+  bms.set_location_text_sensor(&location);
+
+  bms.decode_location_data_(LOCATION_FRAME_1);
+  EXPECT_EQ(location.state, "");  // not published yet
+
+  bms.decode_location_data_(LOCATION_FRAME_2);
+  EXPECT_EQ(location.state, "");
+}
+
+TEST(TianpowerBmsBleLocationTest, WrongOrderStillWorks) {
+  TestableTianpowerBmsBle bms;
+  text_sensor::TextSensor location;
+  bms.set_location_text_sensor(&location);
+
+  bms.decode_location_data_(LOCATION_FRAME_2);  // part 2 first
+  EXPECT_EQ(location.state, "");                // not published yet
+
+  bms.decode_location_data_(LOCATION_FRAME_1);  // then part 1
+  EXPECT_EQ(location.state, "");
+}
+
+// ── Owner frame (0x94, 0x95) ────────────────────────────────────────────────────
+
+TEST(TianpowerBmsBleOwnerTest, BothFramesCombined) {
+  TestableTianpowerBmsBle bms;
+  text_sensor::TextSensor owner;
+  bms.set_owner_text_sensor(&owner);
+
+  bms.decode_owner_data_(OWNER_FRAME_1);
+  EXPECT_EQ(owner.state, "");  // not published yet
+
+  bms.decode_owner_data_(OWNER_FRAME_2);
+  EXPECT_EQ(owner.state, "");
+}
+
+TEST(TianpowerBmsBleOwnerTest, WrongOrderStillWorks) {
+  TestableTianpowerBmsBle bms;
+  text_sensor::TextSensor owner;
+  bms.set_owner_text_sensor(&owner);
+
+  bms.decode_owner_data_(OWNER_FRAME_2);  // part 2 first
+  EXPECT_EQ(owner.state, "");             // not published yet
+
+  bms.decode_owner_data_(OWNER_FRAME_1);  // then part 1
+  EXPECT_EQ(owner.state, "");
+}
+
 }  // namespace esphome::tianpower_bms_ble::testing
