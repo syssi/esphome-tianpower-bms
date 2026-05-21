@@ -9,7 +9,7 @@ esphome:
   comment: ${device_description}
   project:
     name: "syssi.esphome-tianpower-bms"
-    version: 2.2.0
+    version: 2.3.0
 
 esp32:
   board: wemos_d1_mini32
