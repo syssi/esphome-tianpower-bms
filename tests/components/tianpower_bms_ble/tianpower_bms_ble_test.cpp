@@ -371,4 +371,203 @@ TEST(TianpowerBmsBleDispatchTest, InvalidFrameWrongEnd) {
   EXPECT_FLOAT_EQ(soc.state, -1.0f);
 }
 
+// ── Online status tracker ────────────────────────────────────────────────────
+
+TEST(TianpowerBmsBleOnlineStatusTrackerTest, TrackBeforeThresholdDoesNotPublishUnavailable) {
+  TestableTianpowerBmsBle bms;
+  binary_sensor::BinarySensor online;
+  bms.set_online_status_binary_sensor(&online);
+
+  for (int i = 0; i < 9; i++)
+    bms.track_online_status_();
+
+  EXPECT_EQ(bms.get_no_response_count(), 9);
+  EXPECT_FALSE(online.has_state());
+}
+
+TEST(TianpowerBmsBleOnlineStatusTrackerTest, TrackAtThresholdPublishesUnavailable) {
+  TestableTianpowerBmsBle bms;
+  binary_sensor::BinarySensor online;
+  sensor::Sensor voltage;
+  bms.set_online_status_binary_sensor(&online);
+  bms.set_total_voltage_sensor(&voltage);
+
+  for (int i = 0; i < 10; i++)
+    bms.track_online_status_();
+
+  EXPECT_TRUE(online.has_state());
+  EXPECT_FALSE(online.state);
+  EXPECT_TRUE(std::isnan(voltage.state));
+}
+
+TEST(TianpowerBmsBleOnlineStatusTrackerTest, TrackBeyondThresholdDoesNotRepeat) {
+  TestableTianpowerBmsBle bms;
+  binary_sensor::BinarySensor online;
+  bms.set_online_status_binary_sensor(&online);
+
+  for (int i = 0; i < 10; i++)
+    bms.track_online_status_();
+
+  EXPECT_FALSE(online.state);
+  online.publish_state(true);  // manually override after first unavailable
+
+  bms.track_online_status_();  // 11th call — must not re-publish unavailable
+
+  EXPECT_TRUE(online.state);  // still true — not overwritten again
+}
+
+TEST(TianpowerBmsBleOnlineStatusTrackerTest, ResetSetsOnlineStatusTrue) {
+  TestableTianpowerBmsBle bms;
+  binary_sensor::BinarySensor online;
+  bms.set_online_status_binary_sensor(&online);
+
+  bms.reset_online_status_tracker_();
+
+  EXPECT_TRUE(online.has_state());
+  EXPECT_TRUE(online.state);
+  EXPECT_EQ(bms.get_no_response_count(), 0);
+}
+
+TEST(TianpowerBmsBleOnlineStatusTrackerTest, ResetAfterUnavailableReenablesTracker) {
+  TestableTianpowerBmsBle bms;
+  binary_sensor::BinarySensor online;
+  sensor::Sensor voltage;
+  bms.set_online_status_binary_sensor(&online);
+  bms.set_total_voltage_sensor(&voltage);
+
+  for (int i = 0; i < 10; i++)
+    bms.track_online_status_();
+  EXPECT_FALSE(online.state);
+
+  bms.reset_online_status_tracker_();
+  EXPECT_TRUE(online.state);
+  EXPECT_EQ(bms.get_no_response_count(), 0);
+
+  // second disconnection — tracker must trigger again
+  voltage.publish_state(52.0f);
+  for (int i = 0; i < 10; i++)
+    bms.track_online_status_();
+
+  EXPECT_FALSE(online.state);
+  EXPECT_TRUE(std::isnan(voltage.state));
+}
+
+TEST(TianpowerBmsBleOnlineStatusTrackerTest, ValidFrameViaOnDataResetsTracker) {
+  TestableTianpowerBmsBle bms;
+  binary_sensor::BinarySensor online;
+  bms.set_online_status_binary_sensor(&online);
+
+  for (int i = 0; i < 9; i++)
+    bms.track_online_status_();
+
+  bms.on_tianpower_bms_ble_data(0x13, STATUS_FRAME_1);  // valid frame resets counter
+
+  EXPECT_EQ(bms.get_no_response_count(), 0);
+  EXPECT_TRUE(online.state);
+
+  // 10 more tracks after reset must trigger unavailable again
+  for (int i = 0; i < 10; i++)
+    bms.track_online_status_();
+  EXPECT_FALSE(online.state);
+}
+
+// ── publish_device_unavailable_ ──────────────────────────────────────────────
+
+TEST(TianpowerBmsBlePublishDeviceUnavailableTest, SetsOnlineStatusFalse) {
+  TestableTianpowerBmsBle bms;
+  binary_sensor::BinarySensor online;
+  bms.set_online_status_binary_sensor(&online);
+
+  bms.publish_device_unavailable_();
+
+  EXPECT_TRUE(online.has_state());
+  EXPECT_FALSE(online.state);
+}
+
+TEST(TianpowerBmsBlePublishDeviceUnavailableTest, SetsNumericSensorsToNAN) {
+  TestableTianpowerBmsBle bms;
+  sensor::Sensor voltage, current, power, charging_power, discharging_power;
+  sensor::Sensor capacity_remaining, soc, soh, cycles, avg_temp;
+  sensor::Sensor balancing_bitmask, alarm_bitmask;
+  bms.set_total_voltage_sensor(&voltage);
+  bms.set_current_sensor(&current);
+  bms.set_power_sensor(&power);
+  bms.set_charging_power_sensor(&charging_power);
+  bms.set_discharging_power_sensor(&discharging_power);
+  bms.set_capacity_remaining_sensor(&capacity_remaining);
+  bms.set_state_of_charge_sensor(&soc);
+  bms.set_state_of_health_sensor(&soh);
+  bms.set_charging_cycles_sensor(&cycles);
+  bms.set_average_temperature_sensor(&avg_temp);
+  bms.set_balancing_bitmask_sensor(&balancing_bitmask);
+  bms.set_alarm_bitmask_sensor(&alarm_bitmask);
+
+  bms.publish_device_unavailable_();
+
+  EXPECT_TRUE(std::isnan(voltage.state));
+  EXPECT_TRUE(std::isnan(current.state));
+  EXPECT_TRUE(std::isnan(power.state));
+  EXPECT_TRUE(std::isnan(charging_power.state));
+  EXPECT_TRUE(std::isnan(discharging_power.state));
+  EXPECT_TRUE(std::isnan(capacity_remaining.state));
+  EXPECT_TRUE(std::isnan(soc.state));
+  EXPECT_TRUE(std::isnan(soh.state));
+  EXPECT_TRUE(std::isnan(cycles.state));
+  EXPECT_TRUE(std::isnan(avg_temp.state));
+  EXPECT_TRUE(std::isnan(balancing_bitmask.state));
+  EXPECT_TRUE(std::isnan(alarm_bitmask.state));
+}
+
+TEST(TianpowerBmsBlePublishDeviceUnavailableTest, SetsCellVoltageAndTemperatureSensorsToNAN) {
+  TestableTianpowerBmsBle bms;
+  sensor::Sensor cell1, cell16, temp1, temp4;
+  bms.set_cell_voltage_sensor(0, &cell1);
+  bms.set_cell_voltage_sensor(15, &cell16);
+  bms.set_temperature_sensor(0, &temp1);
+  bms.set_temperature_sensor(3, &temp4);
+
+  bms.publish_device_unavailable_();
+
+  EXPECT_TRUE(std::isnan(cell1.state));
+  EXPECT_TRUE(std::isnan(cell16.state));
+  EXPECT_TRUE(std::isnan(temp1.state));
+  EXPECT_TRUE(std::isnan(temp4.state));
+}
+
+TEST(TianpowerBmsBlePublishDeviceUnavailableTest, SetsDynamicTextSensorsToOffline) {
+  TestableTianpowerBmsBle bms;
+  text_sensor::TextSensor voltage_prot, current_prot, temp_prot, errors;
+  bms.set_voltage_protection_text_sensor(&voltage_prot);
+  bms.set_current_protection_text_sensor(&current_prot);
+  bms.set_temperature_protection_text_sensor(&temp_prot);
+  bms.set_errors_text_sensor(&errors);
+
+  bms.publish_device_unavailable_();
+
+  EXPECT_EQ(voltage_prot.state, "Offline");
+  EXPECT_EQ(current_prot.state, "Offline");
+  EXPECT_EQ(temp_prot.state, "Offline");
+  EXPECT_EQ(errors.state, "Offline");
+}
+
+TEST(TianpowerBmsBlePublishDeviceUnavailableTest, LeavesStaticTextSensorsUnchanged) {
+  TestableTianpowerBmsBle bms;
+  text_sensor::TextSensor sw_version, device_model;
+  bms.set_software_version_text_sensor(&sw_version);
+  bms.set_device_model_text_sensor(&device_model);
+
+  bms.decode_software_version_data_(SOFTWARE_VERSION_FRAME_1);  // "0.1.10"
+  bms.decode_hardware_version_data_(HARDWARE_VERSION_FRAME_1);  // "TP-LT55"
+
+  bms.publish_device_unavailable_();
+
+  EXPECT_EQ(sw_version.state, "0.1.10");
+  EXPECT_EQ(device_model.state, "TP-LT55");
+}
+
+TEST(TianpowerBmsBlePublishDeviceUnavailableTest, NullSensorsDoNotCrash) {
+  TestableTianpowerBmsBle bms;
+  bms.publish_device_unavailable_();  // all sensors null — must not crash
+}
+
 }  // namespace esphome::tianpower_bms_ble::testing
