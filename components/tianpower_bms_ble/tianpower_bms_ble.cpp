@@ -554,7 +554,47 @@ void TianpowerBmsBle::reset_online_status_tracker_() {
   this->publish_state_(this->online_status_binary_sensor_, true);
 }
 
-void TianpowerBmsBle::publish_device_unavailable_() { this->publish_state_(this->online_status_binary_sensor_, false); }
+void TianpowerBmsBle::publish_device_unavailable_() {
+  this->publish_state_(this->online_status_binary_sensor_, false);
+
+  this->publish_state_(this->total_voltage_sensor_, NAN);
+  this->publish_state_(this->current_sensor_, NAN);
+  this->publish_state_(this->power_sensor_, NAN);
+  this->publish_state_(this->charging_power_sensor_, NAN);
+  this->publish_state_(this->discharging_power_sensor_, NAN);
+  this->publish_state_(this->capacity_remaining_sensor_, NAN);
+  this->publish_state_(this->voltage_protection_bitmask_sensor_, NAN);
+  this->publish_state_(this->current_protection_bitmask_sensor_, NAN);
+  this->publish_state_(this->temperature_protection_bitmask_sensor_, NAN);
+  this->publish_state_(this->error_bitmask_sensor_, NAN);
+  this->publish_state_(this->state_of_charge_sensor_, NAN);
+  this->publish_state_(this->nominal_capacity_sensor_, NAN);
+  this->publish_state_(this->charging_cycles_sensor_, NAN);
+  this->publish_state_(this->average_temperature_sensor_, NAN);
+  this->publish_state_(this->ambient_temperature_sensor_, NAN);
+  this->publish_state_(this->mosfet_temperature_sensor_, NAN);
+  this->publish_state_(this->state_of_health_sensor_, NAN);
+  this->publish_state_(this->balancing_bitmask_sensor_, NAN);
+  this->publish_state_(this->alarm_bitmask_sensor_, NAN);
+  this->publish_state_(this->min_cell_voltage_sensor_, NAN);
+  this->publish_state_(this->max_cell_voltage_sensor_, NAN);
+  this->publish_state_(this->min_voltage_cell_sensor_, NAN);
+  this->publish_state_(this->max_voltage_cell_sensor_, NAN);
+  this->publish_state_(this->delta_cell_voltage_sensor_, NAN);
+  this->publish_state_(this->average_cell_voltage_sensor_, NAN);
+
+  for (auto &cell : this->cells_) {
+    this->publish_state_(cell.cell_voltage_sensor_, NAN);
+  }
+  for (auto &temp : this->temperatures_) {
+    this->publish_state_(temp.temperature_sensor_, NAN);
+  }
+
+  this->publish_state_(this->voltage_protection_text_sensor_, "Offline");
+  this->publish_state_(this->current_protection_text_sensor_, "Offline");
+  this->publish_state_(this->temperature_protection_text_sensor_, "Offline");
+  this->publish_state_(this->errors_text_sensor_, "Offline");
+}
 
 void TianpowerBmsBle::publish_state_(binary_sensor::BinarySensor *binary_sensor, const bool &state) {
   if (binary_sensor == nullptr)
