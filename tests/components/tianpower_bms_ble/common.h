@@ -16,6 +16,11 @@ class TestableTianpowerBmsBle : public TianpowerBmsBle {
   using TianpowerBmsBle::decode_temperature_data_;
   using TianpowerBmsBle::decode_cell_voltages_data_;
   using TianpowerBmsBle::on_tianpower_bms_ble_data;
+  using TianpowerBmsBle::track_online_status_;
+  using TianpowerBmsBle::reset_online_status_tracker_;
+  using TianpowerBmsBle::publish_device_unavailable_;
+
+  uint8_t get_no_response_count() const { return no_response_count_; }
 };
 
 // ── Real frames from tests/esp32-ble-example-faker.yaml ───────────────────────
