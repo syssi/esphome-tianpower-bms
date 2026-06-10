@@ -633,8 +633,6 @@ void TianpowerBmsBle::gattc_event_handler(esp_gattc_cb_event_t event, esp_gatt_i
     case ESP_GATTC_DISCONNECT_EVT: {
       this->node_state = espbt::ClientState::IDLE;
 
-      // this->publish_state_(this->voltage_sensor_, NAN);
-
       if (this->char_notify_handle_ != 0) {
         auto status = esp_ble_gattc_unregister_for_notify(this->parent()->get_gattc_if(),
                                                           this->parent()->get_remote_bda(), this->char_notify_handle_);
