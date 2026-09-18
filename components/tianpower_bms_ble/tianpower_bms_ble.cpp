@@ -668,22 +668,6 @@ void TianpowerBmsBle::gattc_event_handler(esp_gattc_cb_event_t event, esp_gatt_i
         ESP_LOGW(TAG, "esp_ble_gattc_register_for_notify failed, status=%d", status);
       }
 
-      //      auto *char_notify2 =
-      //          this->parent_->get_characteristic(TIANPOWER_BMS_SERVICE_UUID,
-      //          TIANPOWER_BMS_NOTIFY2_CHARACTERISTIC_UUID);
-      //      if (char_notify2 == nullptr) {
-      //        ESP_LOGE(TAG, "[%s] No notify service found at device, not an Tianpower BMS..?",
-      //                 ADDR_STR(this->parent_->address_str()).c_str());
-      //        break;
-      //      }
-      //      this->char_notify2_handle_ = char_notify->handle;
-      //
-      //      auto status2 = esp_ble_gattc_register_for_notify(this->parent()->get_gattc_if(),
-      //        this->parent()->get_remote_bda(), char_notify->handle);
-      //      if (status2) {
-      //        ESP_LOGW(TAG, "esp_ble_gattc_register_for_notify failed, status=%d", status2);
-      //      }
-
       auto *char_command =
           this->parent_->get_characteristic(TIANPOWER_BMS_SERVICE_UUID, TIANPOWER_BMS_CONTROL_CHARACTERISTIC_UUID);
       if (char_command == nullptr) {
