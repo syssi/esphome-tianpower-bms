@@ -1,16 +1,12 @@
 """Schema structure tests for tianpower_bms_ble ESPHome component modules."""
 
-import os
+from pathlib import Path
 import sys
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
+sys.path.insert(0, str(Path(__file__).parent.parent))
 
 import components.tianpower_bms_ble as hub  # noqa: E402
-from components.tianpower_bms_ble import (  # noqa: E402
-    binary_sensor,
-    sensor,
-    text_sensor,
-)
+from components.tianpower_bms_ble import binary_sensor, sensor, text_sensor  # noqa: E402
 
 
 class TestHubConstants:
