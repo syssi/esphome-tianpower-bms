@@ -570,4 +570,86 @@ TEST(TianpowerBmsBlePublishDeviceUnavailableTest, NullSensorsDoNotCrash) {
   bms.publish_device_unavailable_();  // all sensors null — must not crash
 }
 
+// ── Location / owner frames (0x90/0x91, 0x94/0x95) ──────────────────────────
+
+TEST(TianpowerBmsBleMultiFrameStringTest, LocationBothPartsInOrder) {
+  TestableTianpowerBmsBle bms;
+  text_sensor::TextSensor location;
+  bms.set_location_text_sensor(&location);
+
+  bms.on_tianpower_bms_ble_data(0, LOCATION_FRAME_1);
+  EXPECT_FALSE(location.has_state());
+
+  bms.on_tianpower_bms_ble_data(0, LOCATION_FRAME_2);
+  EXPECT_EQ(location.state, "Garage Shelf 2 / Rack B");
+}
+
+TEST(TianpowerBmsBleMultiFrameStringTest, LocationBothPartsReversed) {
+  TestableTianpowerBmsBle bms;
+  text_sensor::TextSensor location;
+  bms.set_location_text_sensor(&location);
+
+  bms.on_tianpower_bms_ble_data(0, LOCATION_FRAME_2);
+  EXPECT_FALSE(location.has_state());
+
+  bms.on_tianpower_bms_ble_data(0, LOCATION_FRAME_1);
+  EXPECT_EQ(location.state, "Garage Shelf 2 / Rack B");
+}
+
+TEST(TianpowerBmsBleMultiFrameStringTest, RepeatedSamePartDoesNotPublish) {
+  TestableTianpowerBmsBle bms;
+  text_sensor::TextSensor location;
+  bms.set_location_text_sensor(&location);
+
+  bms.on_tianpower_bms_ble_data(0, LOCATION_FRAME_2);
+  bms.on_tianpower_bms_ble_data(0, LOCATION_FRAME_2);
+  EXPECT_FALSE(location.has_state());
+}
+
+TEST(TianpowerBmsBleMultiFrameStringTest, OwnerBothParts) {
+  TestableTianpowerBmsBle bms;
+  text_sensor::TextSensor owner;
+  bms.set_owner_text_sensor(&owner);
+
+  bms.on_tianpower_bms_ble_data(0, OWNER_FRAME_1);
+  EXPECT_FALSE(owner.has_state());
+
+  bms.on_tianpower_bms_ble_data(0, OWNER_FRAME_2);
+  EXPECT_EQ(owner.state, "John Doe Solar Setup");
+}
+
+TEST(TianpowerBmsBleMultiFrameStringTest, LocationAndOwnerDoNotInterfere) {
+  TestableTianpowerBmsBle bms;
+  text_sensor::TextSensor location;
+  text_sensor::TextSensor owner;
+  bms.set_location_text_sensor(&location);
+  bms.set_owner_text_sensor(&owner);
+
+  bms.on_tianpower_bms_ble_data(0, LOCATION_FRAME_1);
+  bms.on_tianpower_bms_ble_data(0, OWNER_FRAME_2);
+  bms.on_tianpower_bms_ble_data(0, OWNER_FRAME_1);
+  bms.on_tianpower_bms_ble_data(0, LOCATION_FRAME_2);
+
+  EXPECT_EQ(location.state, "Garage Shelf 2 / Rack B");
+  EXPECT_EQ(owner.state, "John Doe Solar Setup");
+}
+
+TEST(TianpowerBmsBleMultiFrameStringTest, FullLengthStringWithoutTerminator) {
+  TestableTianpowerBmsBle bms;
+  text_sensor::TextSensor owner;
+  bms.set_owner_text_sensor(&owner);
+
+  std::vector<uint8_t> part1(20, 'A');
+  std::vector<uint8_t> part2(20, 'B');
+  part1[0] = part2[0] = 0x55;
+  part1[1] = part2[1] = 0x14;
+  part1[2] = 0x94;
+  part2[2] = 0x95;
+  part1[19] = part2[19] = 0xaa;
+
+  bms.on_tianpower_bms_ble_data(0, part1);
+  bms.on_tianpower_bms_ble_data(0, part2);
+  EXPECT_EQ(owner.state, std::string(16, 'A') + std::string(16, 'B'));
+}
+
 }  // namespace esphome::tianpower_bms_ble::testing

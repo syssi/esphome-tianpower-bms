@@ -171,11 +171,13 @@ void TianpowerBmsBle::on_tianpower_bms_ble_data(const uint8_t &handle, const std
       break;
     case TIANPOWER_FRAME_TYPE_LOCATION:
     case TIANPOWER_FRAME_TYPE_LOCATION + 1:
-      this->decode_location_data_(data);
+      this->decode_multi_frame_string_(this->location_, this->location_text_sensor_,
+                                       frame_type - TIANPOWER_FRAME_TYPE_LOCATION, data);
       break;
     case TIANPOWER_FRAME_TYPE_OWNER:
     case TIANPOWER_FRAME_TYPE_OWNER + 1:
-      this->decode_owner_data_(data);
+      this->decode_multi_frame_string_(this->owner_, this->owner_text_sensor_, frame_type - TIANPOWER_FRAME_TYPE_OWNER,
+                                       data);
       break;
     default:
       char hex_buf[format_hex_pretty_size(MAX_HEX_DUMP_BYTES)];
@@ -450,60 +452,28 @@ void TianpowerBmsBle::decode_cell_voltages_data_(const uint8_t &chunk, const std
   //  19   1  0xaa         End of frame
 }
 
-void TianpowerBmsBle::decode_location_data_(const std::vector<uint8_t> &data) {
-  ESP_LOGI(TAG, "Location frame received");
-  ESP_LOGD(TAG, "  %s", format_hex_pretty(&data.front(), data.size()).c_str());  // NOLINT
+void TianpowerBmsBle::decode_multi_frame_string_(MultiFrameString &target, text_sensor::TextSensor *text_sensor,
+                                                 uint8_t part, const std::vector<uint8_t> &data) {
+  ESP_LOGI(TAG, "String frame 0x%02X received (part %u)", data[2], part);
+  log_hex_chunked(TAG, data.data(), data.size());
 
-  uint8_t frame_type = data[2];
-  size_t payload_len = data.size() - 4;
+  // Byte Len Payload      Description
+  //  0    1  0x55         Start of frame
+  //  1    1  0x14         Frame type (Response)
+  //  2    1  0x90         Address (location: 0x90/0x91, owner: 0x94/0x95)
+  //  3   16  ASCII        String part, zero padded
+  auto payload = data.begin() + 3;
+  std::copy(payload, payload + MultiFrameString::PART_SIZE, target.buffer.begin() + part * MultiFrameString::PART_SIZE);
+  target.parts_received |= (1 << part);
 
-  if (frame_type == TIANPOWER_FRAME_TYPE_LOCATION) {
-    this->location_offset_ = 0;
-    memcpy(this->location_string_, &data[3], payload_len);
-    this->location_string_[payload_len] = '\0';
-    this->location_part_received_ = true;
-  } else if (frame_type == TIANPOWER_FRAME_TYPE_LOCATION + 1) {
-    if (!this->location_part_received_) {
-      this->location_offset_ = 16;
-      memcpy(this->location_string_, &data[3], payload_len);
-      this->location_string_[payload_len] = '\0';
-      this->location_part_received_ = true;
-    } else {
-      memcpy(this->location_string_ + this->location_offset_, &data[3], payload_len);
-      this->location_string_[this->location_offset_ + payload_len] = '\0';
-      this->publish_state_(this->location_text_sensor_, std::string(this->location_string_));
-      this->location_part_received_ = false;
-      this->location_offset_ = 0;
-    }
-  }
-}
+  if (target.parts_received != 0b11)
+    return;
 
-void TianpowerBmsBle::decode_owner_data_(const std::vector<uint8_t> &data) {
-  ESP_LOGI(TAG, "Owner frame received");
-  ESP_LOGD(TAG, "  %s", format_hex_pretty(&data.front(), data.size()).c_str());  // NOLINT
+  target.parts_received = 0;
+  auto end = std::find(target.buffer.begin(), target.buffer.end(), '\0');
+  this->publish_state_(text_sensor, std::string(target.buffer.begin(), end));
 
-  uint8_t frame_type = data[2];
-  size_t payload_len = data.size() - 4;
-
-  if (frame_type == TIANPOWER_FRAME_TYPE_OWNER) {
-    this->owner_offset_ = 0;
-    memcpy(this->owner_string_, &data[3], payload_len);
-    this->owner_string_[payload_len] = '\0';
-    this->owner_part_received_ = true;
-  } else if (frame_type == TIANPOWER_FRAME_TYPE_OWNER + 1) {
-    if (!this->owner_part_received_) {
-      this->owner_offset_ = 16;
-      memcpy(this->owner_string_, &data[3], payload_len);
-      this->owner_string_[payload_len] = '\0';
-      this->owner_part_received_ = true;
-    } else {
-      memcpy(this->owner_string_ + this->owner_offset_, &data[3], payload_len);
-      this->owner_string_[this->owner_offset_ + payload_len] = '\0';
-      this->publish_state_(this->owner_text_sensor_, std::string(this->owner_string_));
-      this->owner_part_received_ = false;
-      this->owner_offset_ = 0;
-    }
-  }
+  //  19   1  0xaa         End of frame
 }
 
 void TianpowerBmsBle::dump_config() {  // NOLINT(google-readability-function-size,readability-function-size)
@@ -749,6 +719,10 @@ void TianpowerBmsBle::gattc_event_handler(esp_gattc_cb_event_t event, esp_gatt_i
 
       this->send_command_(TIANPOWER_FRAME_TYPE_SOFTWARE_VERSION);
       this->send_command_(TIANPOWER_FRAME_TYPE_HARDWARE_VERSION);
+      this->send_command_(TIANPOWER_FRAME_TYPE_LOCATION);
+      this->send_command_(TIANPOWER_FRAME_TYPE_LOCATION + 1);
+      this->send_command_(TIANPOWER_FRAME_TYPE_OWNER);
+      this->send_command_(TIANPOWER_FRAME_TYPE_OWNER + 1);
       break;
     }
     case ESP_GATTC_NOTIFY_EVT: {

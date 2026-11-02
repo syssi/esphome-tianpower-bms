@@ -1,5 +1,7 @@
 #pragma once
 
+#include <array>
+
 #include "esphome/core/component.h"
 #include "esphome/components/binary_sensor/binary_sensor.h"
 #include "esphome/components/sensor/sensor.h"
@@ -212,12 +214,14 @@ class TianpowerBmsBle :
   uint8_t cell_voltages_chunks_received_{0};
   uint32_t last_cell_voltages_chunk_timestamp_{0};
 
-  bool location_part_received_{false};
-  bool owner_part_received_{false};
-  char location_string_[32]{};
-  char owner_string_[32]{};
-  uint8_t location_offset_{0};
-  uint8_t owner_offset_{0};
+  // A string spread over two consecutive frames (e.g. 0x90 + 0x91), 16 bytes payload each
+  struct MultiFrameString {
+    static constexpr size_t PART_SIZE = 16;
+    std::array<uint8_t, 2 * PART_SIZE> buffer{};
+    uint8_t parts_received{0};
+  };
+  MultiFrameString location_{};
+  MultiFrameString owner_{};
 
   void decode_software_version_data_(const std::vector<uint8_t> &data);
   void decode_hardware_version_data_(const std::vector<uint8_t> &data);
@@ -226,8 +230,8 @@ class TianpowerBmsBle :
   void decode_mosfet_status_data_(const std::vector<uint8_t> &data);
   void decode_temperature_data_(const std::vector<uint8_t> &data);
   void decode_cell_voltages_data_(const uint8_t &chunk, const std::vector<uint8_t> &data);
-  void decode_location_data_(const std::vector<uint8_t> &data);
-  void decode_owner_data_(const std::vector<uint8_t> &data);
+  void decode_multi_frame_string_(MultiFrameString &target, text_sensor::TextSensor *text_sensor, uint8_t part,
+                                  const std::vector<uint8_t> &data);
   void publish_state_(binary_sensor::BinarySensor *binary_sensor, const bool &state);
   void publish_state_(sensor::Sensor *sensor, float value);
   void publish_state_(text_sensor::TextSensor *text_sensor, const std::string &state);
