@@ -570,4 +570,32 @@ TEST(TianpowerBmsBlePublishDeviceUnavailableTest, NullSensorsDoNotCrash) {
   bms.publish_device_unavailable_();  // all sensors null — must not crash
 }
 
+TEST(TianpowerBmsBlePublishDeviceUnavailableTest, InvalidatesBinarySensors) {
+  TestableTianpowerBmsBle bms;
+  binary_sensor::BinarySensor online, charging, discharging, limiting_current, balancing, cell_1_balancing;
+  binary_sensor::BinarySensor cell_2_balancing;
+  bms.set_online_status_binary_sensor(&online);
+  bms.set_charging_binary_sensor(&charging);
+  bms.set_discharging_binary_sensor(&discharging);
+  bms.set_limiting_current_binary_sensor(&limiting_current);
+  bms.set_balancing_binary_sensor(&balancing);
+  bms.set_cell_balancing_binary_sensor(0, &cell_1_balancing);
+  bms.set_cell_balancing_binary_sensor(1, &cell_2_balancing);
+  const std::vector<binary_sensor::BinarySensor *> binary_sensors = {&charging,  &discharging,      &limiting_current,
+                                                                     &balancing, &cell_1_balancing, &cell_2_balancing};
+
+  online.publish_state(true);
+  for (auto *binary_sensor : binary_sensors) {
+    binary_sensor->publish_state(true);
+  }
+
+  bms.publish_device_unavailable_();
+
+  EXPECT_TRUE(online.has_state());
+  EXPECT_FALSE(online.state);
+  for (size_t i = 0; i < binary_sensors.size(); i++) {
+    EXPECT_FALSE(binary_sensors[i]->has_state()) << "binary sensor index " << i;
+  }
+}
+
 }  // namespace esphome::tianpower_bms_ble::testing
