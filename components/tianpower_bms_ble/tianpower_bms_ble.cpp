@@ -567,6 +567,14 @@ void TianpowerBmsBle::reset_online_status_tracker_() {
 void TianpowerBmsBle::publish_device_unavailable_() {
   this->publish_state_(this->online_status_binary_sensor_, false);
 
+  this->invalidate_binary_sensor_(this->charging_binary_sensor_);
+  this->invalidate_binary_sensor_(this->discharging_binary_sensor_);
+  this->invalidate_binary_sensor_(this->limiting_current_binary_sensor_);
+  this->invalidate_binary_sensor_(this->balancing_binary_sensor_);
+  for (auto &cell : this->cells_) {
+    this->invalidate_binary_sensor_(cell.balancing_binary_sensor_);
+  }
+
   this->publish_state_(this->total_voltage_sensor_, NAN);
   this->publish_state_(this->current_sensor_, NAN);
   this->publish_state_(this->power_sensor_, NAN);
@@ -611,6 +619,13 @@ void TianpowerBmsBle::publish_state_(binary_sensor::BinarySensor *binary_sensor,
     return;
 
   binary_sensor->publish_state(state);
+}
+
+void TianpowerBmsBle::invalidate_binary_sensor_(binary_sensor::BinarySensor *binary_sensor) {
+  if (binary_sensor == nullptr)
+    return;
+
+  binary_sensor->invalidate_state();
 }
 
 void TianpowerBmsBle::publish_state_(sensor::Sensor *sensor, float value) {

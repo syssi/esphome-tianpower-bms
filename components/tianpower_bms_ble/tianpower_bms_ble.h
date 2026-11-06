@@ -214,6 +214,7 @@ class TianpowerBmsBle :
   void decode_temperature_data_(const std::vector<uint8_t> &data);
   void decode_cell_voltages_data_(const uint8_t &chunk, const std::vector<uint8_t> &data);
   void publish_state_(binary_sensor::BinarySensor *binary_sensor, const bool &state);
+  void invalidate_binary_sensor_(binary_sensor::BinarySensor *binary_sensor);
   void publish_state_(sensor::Sensor *sensor, float value);
   void publish_state_(text_sensor::TextSensor *text_sensor, const std::string &state);
   void publish_device_unavailable_();
